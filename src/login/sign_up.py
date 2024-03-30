@@ -1,6 +1,5 @@
 import customtkinter
 import os, sys
-from PIL import Image, ImageTk
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import utils
@@ -38,15 +37,14 @@ label_password = customtkinter.CTkLabel(login_canvas, text="Mot de passe")
 button_login = customtkinter.CTkButton(app, text="Se connecter", command=button_callback)
 #button_login.grid(row=1, column=2)"""
 
-chemin_images = os.path.abspath(os.path.join(os.getcwd(), "images"))
 
-
-img = ImageTk.PhotoImage(Image.open(f"{chemin_images}\\background_login.png").resize((login_canvas.winfo_width(), login_canvas.winfo_height())))
-login_canvas.create_image(0,0, anchor=customtkinter.NW, image=img)
-
+background_img = utils.get_image("background_login.png", login_canvas.winfo_width(), login_canvas.winfo_height())
+login_canvas.create_image(0,0, anchor=customtkinter.NW, image=background_img)
 
 
 app.mainloop()
+
+
 
 
 

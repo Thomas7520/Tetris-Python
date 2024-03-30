@@ -1,3 +1,8 @@
+import os
+from PIL import Image, ImageTk
+
+chemin_images = os.path.abspath(os.path.join(os.getcwd(), "images"))
+
 def center_window(app, window_width, window_height):
     screen_width = app.winfo_screenwidth()
     screen_height = app.winfo_screenheight()
@@ -33,3 +38,19 @@ def round_rectangle(canvas, x1, y1, x2, y2, radius=25, **kwargs):
 
     return canvas.create_polygon(points, **kwargs, smooth=True)
 
+
+def get_image(name: str, width: int, height: int) -> ImageTk.PhotoImage:
+    """
+    Opens an image from the images folder and resizes it to the specified dimensions.
+
+    Args:
+        name (str): The name of the image file, without the extension.
+        width (int): The desired width of the image.
+        height (int): The desired height of the image.
+
+    Returns:
+        ImageTk.PhotoImage: The resized image.
+
+    """
+    return ImageTk.PhotoImage(Image.open(f"{chemin_images}/{name}").resize((width, height)))
+    
