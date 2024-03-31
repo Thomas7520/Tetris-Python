@@ -8,7 +8,7 @@ import utils
     
 
 def label_new_accound_hover_on(event):
-    label_new_account.configure(text_color="#E44982")
+    label_new_account.configure(text_color="#436e77")
     app.config(cursor="hand2")
 
 def label_new_accound_hover_off(event):
@@ -29,33 +29,26 @@ window_height = 500
 window_width = 1000
 
 app.minsize(window_width, window_height)
+app.grid_rowconfigure(0, weight=1)
+app.grid_columnconfigure(0, weight=1)
+app.update()
 
 utils.center_window(app, window_width, window_height)
 
-app.grid_rowconfigure(0, weight = 0)
-app.grid_columnconfigure(1, weight = 0)
-
-app.update()
 
 login_canvas = customtkinter.CTkCanvas(app, width=app.winfo_width(), height=app.winfo_height(),  background="#1d2a2f", highlightthickness=0)
-login_canvas.grid(row=0, column=0, sticky="nsew")  # Le canevas s'étend dans toutes les directions
+login_canvas.grid(row=0, column=0, sticky="nsew")
 login_canvas.update()
 
 
 
+title_image = utils.get_image("title_tetris.png", 512, 153)
 
-image = utils.get_image("title_tetris.png", 512, 153)  # Insérer le chemin de votre image
+title_x = (login_canvas.winfo_width() - title_image.width()) / 2
+title_y = 25
 
-x = (login_canvas.winfo_width() - image.width()) / 2
-y = 25
-
-# Placer l'image au centre du canevas
-
-image_label = customtkinter.CTkLabel(master=app, text="", image=image, bg_color="#1d2a2f")
+image_label = customtkinter.CTkLabel(master=app, text="", image=title_image, bg_color="#1d2a2f")
 image_label.grid(row=0, column=0, pady=20, sticky="N")
-
-app.grid_rowconfigure(0, weight=1)  # Permet au canevas de s'étendre verticalement
-app.grid_columnconfigure(0, weight=1)  # Permet au canevas de s'étendre horizontalement
 
 
 login_frame = customtkinter.CTkFrame(master=login_canvas, fg_color="#69a0a7", corner_radius=20, width=window_width - 400, height=window_height - 200)
