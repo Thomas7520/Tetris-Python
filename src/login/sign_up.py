@@ -4,6 +4,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import utils
 
+    
 def label_new_account_hover_on(event):
     label_create_account.configure(text_color="#2e2e2e")
     app.config(cursor="hand2")
@@ -33,6 +34,7 @@ app.grid_rowconfigure(0, weight=1)
 app.grid_rowconfigure(1, weight=1)
 app.grid_columnconfigure(0, weight=1)
 app.update()
+
 
 #utils.center_window(app, window_width, window_height)
 
