@@ -4,6 +4,14 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import utils
 
+def label_new_account_hover_on(event):
+    label_create_account.configure(text_color="#2e2e2e")
+    app.config(cursor="hand2")
+
+def label_new_account_hover_off(event):
+    label_create_account.configure(text_color="#9A9A9A")
+    app.config(cursor="")
+
 def open_new_account_window(event):
     pass
 
@@ -17,11 +25,9 @@ app.title("Login")
 window_height = 600 * 1
 window_width = 900 * 1
 
-print(app.winfo_height())
-print(app.winfo_width())
 app.config(background='#96B5BA')
 
-app.minsize(200, 200) # Avant c'était window_height et window_width mais ça semble rendre mieux ainsi, à voir
+app.minsize(600, 563) # Avant c'était window_height et window_width mais ça semble rendre mieux ainsi, à voir
 
 app.grid_rowconfigure(0, weight=1)
 app.grid_rowconfigure(1, weight=1)
@@ -100,6 +106,8 @@ frame_components_bottom.update()
 
 
 label_create_account = customtkinter.CTkLabel(master=frame_components_bottom, text="Créer un compte", width=200, text_color="#9A9A9A", fg_color="white", bg_color="white",font=("Arial Bold", 20))
+label_create_account.bind("<Enter>", label_new_account_hover_on)
+label_create_account.bind("<Leave>", label_new_account_hover_off)
 label_create_account.bind("<Button-1>", open_new_account_window)
 label_create_account.grid(row=0, column=0, sticky="w", padx=25)
 label_create_account.update()
@@ -107,7 +115,5 @@ label_create_account.update()
 button_login = customtkinter.CTkButton(master=frame_components_bottom,text="Se connecter", corner_radius=0, height=65, bg_color="#67E9DA", fg_color="#67E9DA", hover_color="#436e77", font=("Arial Bold", 20), text_color="white", width=250, cursor="hand2", command=button_login_press)
 button_login.grid(row=0, column=1, sticky="e", padx=25)
 button_login.update()
-
-#login_canvas.create_rectangle(0, 0, login_canvas.winfo_width(), 10, fill="#626F71", outline="")
 
 app.mainloop()
