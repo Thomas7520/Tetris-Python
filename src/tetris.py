@@ -162,6 +162,7 @@ def main():
     global app, window_width, window_height, actual_piece 
 
     app = tk.Tk() 
+    ps.playsound("\song\TetrisSong.wav")
     app.attributes("-fullscreen", True)
     window_width = app.winfo_screenwidth()
     window_height = app.winfo_screenheight()
