@@ -1,5 +1,6 @@
 # Imports
 import tkinter as tk
+import time
 
 # Grid size parameters
 GRID_WIDTH = 10
@@ -91,16 +92,34 @@ def draw_tetris_piece(x, y, shape_index):
         color (str): The color of the block
 
     Returns:
-        None
+        Piece
 
     """
+    global piece, shape, color
     # Select color for the piece and get the shape of the piece
     color = BLOCK_COLORS[shape_index % len(BLOCK_COLORS)]  
     shape = TETRIS_SHAPES[shape_index]  
     
     # Draw each block of the piece
     for block in shape:
-        draw_block(x + block[0], y + block[1], color)
+        piece = draw_block(x + block[0], y + block[1], color)
+    return shape
+
+def move_piece(event):
+    global actual_piece
+    key = event.keysym
+    if key == "Left":
+        actual_piece[0] -= 1
+    if key == "Right":
+        actual_piece[0] += 1
+    if key == "Down":
+        actual_piece[1] -= 1
+
+def key_pressed(event):
+    key = event.keysym 
+    if  key == 'Left':
+        move_piece()
+        
     
 def main():
     """
@@ -118,6 +137,10 @@ def main():
     # Create the main window
     app = tk.Tk() 
 
+
+    app.bind("<Left>",key_event)
+    app.bind("<Right>",key_event)
+
     # Set the size of the window to fullscreen
     app.attributes("-fullscreen", True)
     
@@ -129,10 +152,12 @@ def main():
     create_tetris_playfield()  
 
     # Simple L tetris piece just to test
-    draw_tetris_piece(GRID_WIDTH // 2, 0, 0)
+    actual_piece = [GRID_WIDTH // 2, 0, 0]
+    draw_tetris_piece(actual_piece[0],actual_piece[1],actual_piece[2])
     
+    mouvements(True)
     # Start the main loop of the application
-    app.mainloop() 
+    app.mainloop()
     
 if __name__ == "__main__":
     main()
