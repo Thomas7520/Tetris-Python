@@ -4,82 +4,75 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import utils
 
-
-    
-
-def label_new_accound_hover_on(event):
-    label_new_account.configure(text_color="#436e77")
-    app.config(cursor="hand2")
-
-def label_new_accound_hover_off(event):
-    label_new_account.configure(text_color="black")
-    app.config(cursor="")
-
 def open_new_account_window(event):
     pass
 
-def button_login():
+def button_login_press():
     print("button pressed")
 
 app = customtkinter.CTk()
 
 app.title("Login")
 
-window_height = 500
-window_width = 1000
+window_height = 600 
+window_width = 900
+
+app.config(background='#96B5BA')
 
 app.minsize(window_width, window_height)
+app.resizable(False,False)
+
 app.grid_rowconfigure(0, weight=1)
+app.grid_rowconfigure(1, weight=1)
 app.grid_columnconfigure(0, weight=1)
 app.update()
 
 utils.center_window(app, window_width, window_height)
 
-
-login_canvas = customtkinter.CTkCanvas(app, width=app.winfo_width(), height=app.winfo_height(),  background="#1d2a2f", highlightthickness=0)
-login_canvas.grid(row=0, column=0, sticky="nsew")
-login_canvas.update()
-
-
+image_canvas = customtkinter.CTkCanvas(app, background="#96B5BA", highlightthickness=0)
+image_canvas.grid(row=0, column=0, sticky="N")
+image_canvas.update()
 
 title_image = utils.get_image("title_tetris.png", 512, 153)
 
-title_x = (login_canvas.winfo_width() - title_image.width()) / 2
+title_x = (image_canvas.winfo_width() - title_image.width()) / 2
 title_y = 25
 
-image_label = customtkinter.CTkLabel(master=app, text="", image=title_image, bg_color="#1d2a2f")
-image_label.grid(row=0, column=0, pady=20, sticky="N")
+image_label = customtkinter.CTkLabel(master=image_canvas, text="", image=title_image, bg_color="#96B5BA")
+image_label.grid(row=0, column=0, pady=20)
+image_label.update()
 
+login_canvas = customtkinter.CTkCanvas(app, width=window_width - 300, height=window_height-240,background="red",highlightthickness=0)
+login_canvas.grid(row=1, column=0, pady=(0,100))
+login_canvas.pack_propagate(0)
+login_canvas.update()
 
-login_frame = customtkinter.CTkFrame(master=login_canvas, fg_color="#69a0a7", corner_radius=20, width=window_width - 400, height=window_height - 200)
-login_frame.pack_propagate(0)
-login_frame.place(anchor='center', relx=0.5, rely=0.63)
+nickname_entry = customtkinter.CTkEntry(master=login_canvas, placeholder_text="Pseudo", height=60, width=login_canvas.winfo_width() - 200 ,fg_color="#D9D9D9", corner_radius=0, border_color="#D9D9D9", bg_color="#D9D9D9",text_color="#9A9A9A", font=("", 20))
+nickname_entry.pack(pady=(50,0))
+nickname_entry.update()
 
+password_entry = customtkinter.CTkEntry(master=login_canvas, placeholder_text="Mot de passe", height=60, width=login_canvas.winfo_width() - 200 ,fg_color="#D9D9D9", corner_radius=0, border_color="#D9D9D9", bg_color="#D9D9D9",text_color="#9A9A9A", font=("", 20))
+password_entry.pack(pady=(20,0))
+password_entry.update()
 
-text_login_color = "black"
+frame_create_account = customtkinter.CTkFrame(login_canvas)
+frame_create_account.pack(side="left",padx=40, pady=10)
 
-customtkinter.CTkLabel(master=login_frame, text="Connectez-vous", text_color=text_login_color, font=("Arial Bold", 24)).pack(anchor="s", pady=(20, 5))
+frame_username = customtkinter.CTkFrame(login_canvas)
+frame_username.pack(side="right",padx=40, pady=10)
 
-customtkinter.CTkLabel(master=login_frame, text="Pseudo:", text_color=text_login_color, font=("Arial Bold", 14), compound="center").pack(anchor="s", pady=(10, 0))
-customtkinter.CTkEntry(master=login_frame, width=225, fg_color="#EEEEEE", border_color=text_login_color, border_width=1, text_color="#000000").pack(anchor="s")
+button_login = customtkinter.CTkButton(master=frame_username,text="Se connecter", corner_radius=0, height=50, bg_color="#67E9DA", fg_color="#67E9DA", hover_color="#436e77", font=("Arial Bold", 20), text_color="white", width=225, cursor="hand2", command=button_login_press)
+button_login.pack()
+button_login.update()
 
-customtkinter.CTkLabel(master=login_frame, text="Mot de passe:", text_color=text_login_color, font=("Arial Bold", 14), compound="center").pack(anchor="s", pady=(5, 0))
-customtkinter.CTkEntry(master=login_frame, width=225, fg_color="#EEEEEE", border_color=text_login_color, border_width=1, text_color="#000000", show="*").pack(anchor="s")
+label_create_account = customtkinter.CTkLabel(master=frame_create_account, text="Créer un compte", text_color="#9A9A9A", fg_color="white", bg_color="white",font=("Arial Bold", 16), command=open_new_account_window)
+label_create_account.pack()
+label_create_account.update()
 
-customtkinter.CTkButton(master=login_frame, text="Se connecter", fg_color="#508991", hover_color="#436e77", font=("Arial Bold", 12), text_color=text_login_color, width=225, cursor="hand2").pack(anchor="s", pady=(30, 0))
-
-label_new_account = customtkinter.CTkLabel(master=login_frame, text="Vous n'avez pas de compte ? Cliquez ici pour vous inscrire", text_color="black", anchor="w", justify="center", font=("Arial Bold", 14), compound="center")
-label_new_account.pack(anchor="s", pady=(25, 0))
-label_new_account.bind("<Enter>", label_new_accound_hover_on)
-label_new_account.bind("<Leave>", label_new_accound_hover_off)
-label_new_account.bind("<Button-1>", open_new_account_window)
-
-label_username = customtkinter.CTkLabel(login_canvas, text="Nom d'utilisateur")
-label_password = customtkinter.CTkLabel(login_canvas, text="Mot de passe")
+login_canvas.create_rectangle(0, 0, login_canvas.winfo_width(), 10, fill="#626F71", outline="")
+login_canvas.create_rectangle(0, 10, login_canvas.winfo_width(), login_canvas.winfo_height(), fill="white", outline="")
 
 app.mainloop()
-
-
 
 
 
