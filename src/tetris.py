@@ -1,5 +1,6 @@
 # Imports
 import tkinter as tk
+import playsound as ps
 import time
 
 # Grid size parameters
@@ -105,22 +106,49 @@ def draw_tetris_piece(x, y, shape_index):
         piece = draw_block(x + block[0], y + block[1], color)
     return shape
 
-def move_piece(event):
+def move_piece(direction):
+    """
+    This function moves the Tetris piece horizontally.
+
+    Args:
+        direction (str): The direction of movement ("left" or "right").
+
+    Returns:
+        None
+    """
     global actual_piece
+
+    if direction == "left":
+        # Move the piece left
+        actual_piece[0] -= 1
+    elif direction == "right":
+        # Move the piece right
+        actual_piece[0] += 1
+    elif direction == "down":
+        actual_piece[1] += 1
+    draw_tetris_piece(actual_piece[0], actual_piece[1], actual_piece[2])
+
+def key_press(event):
+    """
+    This function handles the key press events.
+
+    Args:
+        event (tk.Event): The event object containing information about the key press.
+
+    Returns:
+        None
+    """
     key = event.keysym
     if key == "Left":
-        actual_piece[0] -= 1
-    if key == "Right":
-        actual_piece[0] += 1
-    if key == "Down":
-        actual_piece[1] -= 1
+        # Move the piece left when left arrow key is pressed
+        move_piece("left")
+    elif key == "Right":
+        # Move the piece right when right arrow key is pressed
+        move_piece("right")
+    elif key == "Down":
+        # Move the piece right when right arrow key is pressed
+        move_piece("down")
 
-def key_pressed(event):
-    key = event.keysym 
-    if  key == 'Left':
-        move_piece()
-        
-    
 def main():
     """
     This function is the main function of the application.
@@ -131,33 +159,26 @@ def main():
     Returns:
         None
     """
-    # Global variables to store the width and height of the window
     global app, window_width, window_height, actual_piece 
 
-    # Create the main window
     app = tk.Tk() 
-
-
-    app.bind("<Left>",key_event)
-    app.bind("<Right>",key_event)
-
-    # Set the size of the window to fullscreen
     app.attributes("-fullscreen", True)
-    
-    # Get the width and height of the screen
     window_width = app.winfo_screenwidth()
     window_height = app.winfo_screenheight()
 
-    # Create the tetris playfield on the screen
     create_tetris_playfield()  
+    actual_piece = [GRID_WIDTH // 2, 0, 0]  # Initial position of the piece
 
-    # Simple L tetris piece just to test
-    actual_piece = [GRID_WIDTH // 2, 0, 0]
-    draw_tetris_piece(actual_piece[0],actual_piece[1],actual_piece[2])
-    
-    mouvements(True)
-    # Start the main loop of the application
-    app.mainloop()
-    
+    draw_tetris_piece(actual_piece[0], actual_piece[1], actual_piece[2])
+
+    # Bind key press events to the key_press function
+    app.bind("<KeyPress>", key_press)
+
+    app.mainloop() 
+
+def game_loop():
+    pass
+
 if __name__ == "__main__":
     main()
+    game_loop()
