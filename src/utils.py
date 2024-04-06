@@ -1,7 +1,11 @@
-import os
+import os, re
 from PIL import Image, ImageTk
 
 chemin_images = os.path.abspath(os.path.join(os.getcwd(), "images"))
+
+
+def is_valid_email(email):
+    return re.compile(r'^[\w\.-]+@[\w\.-]+\.\w+$').match(email)
 
 def center_window(app, window_width, window_height):
     screen_width = app.winfo_screenwidth()
