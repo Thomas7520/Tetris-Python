@@ -27,24 +27,22 @@ def run():
     app = customtkinter.CTk()
     app.title("Login")
     app.config(background='#96B5BA')
-    app.minsize(600, 563) # Avant c'était window_height et window_width mais ça semble rendre mieux ainsi, à voir
-    app.geometry("600x563") # C'est le redimensionnement le plus cohérent
 
     app.grid_rowconfigure(0, weight=1)
     app.grid_rowconfigure(1, weight=1)
     app.grid_rowconfigure(2, weight=1)
     app.grid_columnconfigure(0, weight=1)
     app.grid_columnconfigure(1, weight=1)
-    app.grid_columnconfigure(1, weight=1, minsize=650) #Taille minimale du login canva cohérente
+    app.grid_columnconfigure(1, weight=1, minsize=600) #Taille minimale du login canva cohérente
     app.grid_columnconfigure(2, weight=1)
     app.update()
 
 
     # Pour éviter que le login canva prenne toute la place en y, il faut introduire des canvas dans les 2 grilles à gauche et à droite
-    fill_left_canvas = customtkinter.CTkCanvas(app, background=app["background"],highlightthickness=0)
+    fill_left_canvas = customtkinter.CTkCanvas(app, background=app["background"],highlightthickness=0,width=20)
     fill_left_canvas.grid(row=1, column=0, sticky="NSEW")
 
-    fill_right_canvas = customtkinter.CTkCanvas(app, background=app["background"],highlightthickness=0)
+    fill_right_canvas = customtkinter.CTkCanvas(app, background=app["background"],highlightthickness=0,width=20)
     fill_right_canvas.grid(row=1, column=2, sticky="NSEW")
 
 
@@ -123,6 +121,9 @@ def run():
     button_login.grid(row=0, column=1, sticky="e", padx=25, pady=(0,10))
     button_login.update()
 
+    app.minsize(app.winfo_width(), app.winfo_height()) # Avant c'était window_height et window_width mais ça semble rendre mieux ainsi, à voir
+
     app.mainloop()
     
-run()
+if __name__ == "__main__":
+    run()

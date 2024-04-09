@@ -54,22 +54,22 @@ def run():
 
     title_image = utils.get_image("title_tetris.png", 512, 153)
 
-    title_x = (image_canvas.winfo_width() - title_image.width()) / 2
-    title_y = 25
-
     image_title_label = customtkinter.CTkLabel(master=image_canvas, text="", image=title_image, bg_color="#96B5BA")
     image_title_label.grid(row=0, column=0, pady=20)
     image_title_label.update()
 
     login_canvas = customtkinter.CTkCanvas(app, background="white", highlightthickness=0)
-    login_canvas.grid(row=1, column=1, sticky="NSEW")
-    login_canvas.update()
-
-    login_canvas.grid_rowconfigure(0, weight=1)
+    login_canvas.grid_rowconfigure(0, weight=1, minsize=20)
     login_canvas.grid_rowconfigure(1, weight=1)
     login_canvas.grid_rowconfigure(2, weight=1)
 
     login_canvas.grid_columnconfigure(0, weight=1)
+    
+    
+    login_canvas.grid(row=1, column=1, sticky="NSEW")
+    login_canvas.update()
+
+
 
 
     top_bar = customtkinter.CTkFrame(login_canvas, fg_color="#626F71", bg_color="#626F71", height=20)
