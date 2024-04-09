@@ -1,4 +1,6 @@
 import customtkinter
+import CTkMessagebox
+
 import os, sys, time
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -21,8 +23,15 @@ def open_new_account_window(event):
 
 
 def button_login_press():
-    print("button pressed")
-
+    if not username_entry.get():
+        CTkMessagebox.CTkMessagebox(title="Erreur", message="Veuillez saisir un pseudo", icon="warning")
+    elif not password_entry.get():
+        CTkMessagebox.CTkMessagebox(title="Erreur", message="Veuillez saisir un mot de passe", icon="warning")
+    elif not utils.has_account(username_entry.get()) or utils.check_password(username_entry.get(), password_entry.get()):
+        CTkMessagebox.CTkMessagebox(title="Erreur", message="Le nom d'utilisateur ou le mot de passe est incorrect", icon="warning")
+    else:
+        pass
+    
 def run():
     global app 
     app = customtkinter.CTk()
@@ -79,7 +88,7 @@ def run():
 
     frame_components.grid(row=1, column=0, sticky="nsew", pady=10)
 
-
+    global username_entry, password_entry
     username_entry = customtkinter.CTkEntry(master=frame_components, placeholder_text="Pseudo", height=70 ,fg_color="#D9D9D9", corner_radius=0, border_color="#D9D9D9", bg_color="#D9D9D9",text_color="#9A9A9A", font=("", 20))
     username_entry.image = utils.get_image("user_icon.png", 64, 64)
     username_entry.grid(row=0, column=0, sticky="sew", padx=(25,0), pady=5)

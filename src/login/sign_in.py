@@ -21,6 +21,7 @@ def open_new_account_window(event):
 
 
 def button_login_press():
+    if 
     print("button pressed")
 
 
@@ -35,11 +36,11 @@ def run():
     app.grid_rowconfigure(1, weight=1)
     app.grid_rowconfigure(2, weight=1, minsize=20)
     app.grid_columnconfigure(0, weight=1)
-    app.grid_columnconfigure(1, weight=1, minsize=700) #Taille minimale du login canva cohérente
+    app.grid_columnconfigure(1, weight=1, minsize=600) #Taille minimale du login canva cohérente
     app.grid_columnconfigure(2, weight=1)
 
 
-    # Pour éviter que le login canva prenne toute la place en y, il faut introduire des canvas dans les 2 grilles à gauche et à droite
+    # Pour éviter que le login canva prenne toute la place en y, il faut introduire des canvas dans les 2 grilles à gauche et à droite et 1 en bas
     fill_left_canvas = customtkinter.CTkCanvas(app, background=app["background"],highlightthickness=0, width=60)
     fill_left_canvas.grid(row=1, column=0, sticky="NSEW")
 
@@ -63,10 +64,8 @@ def run():
     login_canvas.grid_rowconfigure(2, weight=1)
     login_canvas.grid_columnconfigure(0, weight=1)
     login_canvas.grid(row=1, column=1, sticky="NSEW")
-
+    
     login_canvas.update()
-
-
 
 
     top_bar = customtkinter.CTkFrame(login_canvas, fg_color="#626F71", bg_color="#626F71", height=20)
@@ -83,7 +82,8 @@ def run():
 
     frame_components.grid(row=1, column=0, sticky="nsew", pady=10)
 
-
+    global username_entry, email_entry, password_entry
+    
     username_entry = customtkinter.CTkEntry(master=frame_components, placeholder_text="Pseudo", height=70 ,fg_color="#D9D9D9", corner_radius=0, border_color="#D9D9D9", bg_color="#D9D9D9",text_color="#9A9A9A", font=("", 20))
     username_entry.image = utils.get_image("user_icon.png", 64, 64)
     username_entry.grid(row=0, column=0, sticky="sew", padx=(25,0), pady=5)
