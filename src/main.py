@@ -14,10 +14,10 @@ if __name__ == "__main__":
         os.mkdir(database_root)
     
     dict_test = ["test@gmail.com", "oqjof^z", "test"]
-    utils.write_csv(os.path.join(database_root, "database.csv"), dict_test)
+    utils.write_csv(dict_test)
         
     print(utils.get_users_csv(os.path.join(database_root, "database.csv")))
     
-    print(utils.has_account("test"))
+    print(utils.username_exist("test"))
     
     print(utils.check_password("test", "oqjof^z"))

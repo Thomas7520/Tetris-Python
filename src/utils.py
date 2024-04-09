@@ -5,7 +5,7 @@ from PIL import Image, ImageTk
 root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 image_path = os.path.join(root_path, "images")
-database_root = os.path.join(root_path, "database")
+database_path = os.path.join(root_path, "database")
 database_name = "database.csv"
 
 def is_valid_email(email):
@@ -71,20 +71,26 @@ def get_users_csv(path: str) -> list:
             users_list.append(row)
     return users_list
 
-def write_csv(path: str, new_user: list) -> None:
-        with open(path, 'w', newline='') as file:
+def write_csv(new_user: list) -> None:
+        with open(os.path.join(database_path, "database.csv"), 'a', newline='') as file:
             writer = csv.writer(file, delimiter=';')
             writer.writerow(new_user)
             
 
-def has_account(username : str) -> bool:
-    for user in get_users_csv(database_root + "\\" + database_name):
+def username_exist(username : str) -> bool:
+    for user in get_users_csv(database_path + "\\" + database_name):
         if username in user:
             return True
     return False
 
+def email_exist(email : str) -> bool:
+    for user in get_users_csv(database_path + "\\" + database_name):
+        if email in user:
+            return True
+    return False
+
 def check_password(username : str, password : str) -> bool:
-    for user in get_users_csv(database_root + "\\" + database_name):
+    for user in get_users_csv(database_path + "\\" + database_name):
         if username in user:
             if password == user[1]:
                 return True

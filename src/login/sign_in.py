@@ -1,4 +1,5 @@
 import customtkinter
+import CTkMessagebox
 import os, sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -20,8 +21,20 @@ def open_new_account_window(event):
     sign_up.run()
 
 
-def button_login_press():
-    if 
+def perform_register():
+    if not username_entry.get():
+        CTkMessagebox.CTkMessagebox(title="Erreur", message="Veuillez saisir un pseudo !", icon="warning")
+    elif not password_entry.get():
+        CTkMessagebox.CTkMessagebox(title="Erreur", message="Veuillez saisir un mot de passe !", icon="warning")
+    elif not email_entry.get():
+        CTkMessagebox.CTkMessagebox(title="Erreur", message="Veuillez saisir un email !", icon="warning")
+    elif not utils.is_valid_email(email_entry.get()):
+        CTkMessagebox.CTkMessagebox(title="Erreur", message="Veuillez saisir un email valide !", icon="warning") 
+    elif utils.username_exist(username_entry.get()) or utils.email_exist(email_entry.get()):
+        CTkMessagebox.CTkMessagebox(title="Erreur", message="Le compte existe déjà", icon="warning")
+    else:
+        utils.write_csv([username_entry.get(), email_entry.get(), password_entry.get()])
+        pass
     print("button pressed")
 
 
@@ -103,7 +116,7 @@ def run():
     password_entry = customtkinter.CTkEntry(master=frame_components, placeholder_text="Mot de passe", height=70 ,fg_color="#D9D9D9", corner_radius=0, border_color="#D9D9D9", bg_color="#D9D9D9",text_color="#9A9A9A", show='*', font=("", 20))
     password_entry.image = utils.get_image("password_icon.png", 64, 64)
     password_entry.grid(row=2, column=0, sticky="sew", padx=(25,0), pady=5)
-
+    password_entry.bind("<Return>", perform_register)
     image_password_label = customtkinter.CTkLabel(frame_components, text="", height=70, image=password_entry.image, fg_color="#D9D9D9", bg_color="#D9D9D9")
     image_password_label.grid(row=2, column=1, sticky="se", padx=(0,25), pady=5)
 
@@ -121,7 +134,7 @@ def run():
     label_create_account.bind("<Button-1>", open_new_account_window)
     label_create_account.grid(row=0, column=0, sticky="w", padx=25, pady=(0,10))
 
-    button_login = customtkinter.CTkButton(master=frame_components_bottom,text="Créer le compte", corner_radius=0, height=65, bg_color="#67E9DA", fg_color="#67E9DA", hover_color="#436e77", font=("Arial Bold", 20), text_color="white", width=200, cursor="hand2", command=button_login_press)
+    button_login = customtkinter.CTkButton(master=frame_components_bottom,text="Créer le compte", corner_radius=0, height=65, bg_color="#67E9DA", fg_color="#67E9DA", hover_color="#436e77", font=("Arial Bold", 20), text_color="white", width=200, cursor="hand2", command=perform_register)
     button_login.grid(row=0, column=1, sticky="e", padx=25, pady=(0,10))
 
     app.minsize(app.winfo_width(), app.winfo_height())
