@@ -30,13 +30,12 @@ def run():
 
     app.title("Login")
     app.config(background='#96B5BA')
-    app.geometry("600x600")
 
     app.grid_rowconfigure(0, weight=1)
     app.grid_rowconfigure(1, weight=1)
     app.grid_rowconfigure(2, weight=1)
     app.grid_columnconfigure(0, weight=1)
-    app.grid_columnconfigure(1, weight=1, minsize=600) #Taille minimale du login canva cohérente
+    app.grid_columnconfigure(1, weight=1, minsize=550) #Taille minimale du login canva cohérente
     app.grid_columnconfigure(2, weight=1)
 
 
@@ -64,6 +63,8 @@ def run():
     login_canvas.grid_rowconfigure(2, weight=1)
     login_canvas.grid_columnconfigure(0, weight=1)
     login_canvas.grid(row=1, column=1, sticky="NSEW")
+
+    login_canvas.update()
 
 
 
@@ -123,8 +124,7 @@ def run():
     button_login = customtkinter.CTkButton(master=frame_components_bottom,text="Créer le compte", corner_radius=0, height=65, bg_color="#67E9DA", fg_color="#67E9DA", hover_color="#436e77", font=("Arial Bold", 20), text_color="white", width=200, cursor="hand2", command=button_login_press)
     button_login.grid(row=0, column=1, sticky="e", padx=25, pady=(0,10))
 
-    #app.minsize(app.winfo_width(), app.winfo_height()) # Avant c'était window_height et window_width mais ça semble rendre mieux ainsi, à voir
-
+    app.minsize(app.winfo_width(), app.winfo_height())
     app.mainloop()
     
 if __name__ == "__main__":

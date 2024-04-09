@@ -28,8 +28,6 @@ def run():
     app = customtkinter.CTk()
     app.title("Login")
     app.config(background='#96B5BA')
-    app.geometry("600x600")
-    app.resizable(0,0)
 
     app.grid_rowconfigure(0, weight=1)
     app.grid_rowconfigure(1, weight=1)
@@ -37,7 +35,7 @@ def run():
     app.grid_columnconfigure(0, weight=1)
     app.grid_columnconfigure(1, weight=1, minsize=550) #Taille minimale du login canva cohérente
     app.grid_columnconfigure(2, weight=1)
-
+    app.update()
 
     # Pour éviter que le login canva prenne toute la place en y, il faut introduire des canvas dans les 2 grilles à gauche et à droite
     fill_left_canvas = customtkinter.CTkCanvas(app, background=app["background"], highlightthickness=0, width=20)
@@ -60,11 +58,12 @@ def run():
     login_canvas = customtkinter.CTkCanvas(app, background="white", highlightthickness=0)
     login_canvas.grid(row=1, column=1, sticky="NSEW")
 
-    login_canvas.grid_rowconfigure(0, weight=1)
+    login_canvas.grid_rowconfigure(0, weight=1, minsize=20)
     login_canvas.grid_rowconfigure(1, weight=1)
     login_canvas.grid_rowconfigure(2, weight=1)
 
     login_canvas.grid_columnconfigure(0, weight=1)
+    login_canvas.update()
 
 
     top_bar = customtkinter.CTkFrame(login_canvas, fg_color="#626F71", bg_color="#626F71", height=20)
@@ -112,6 +111,7 @@ def run():
     button_login = customtkinter.CTkButton(master=frame_components_bottom,text="Se connecter", corner_radius=0, height=65, bg_color="#67E9DA", fg_color="#67E9DA", hover_color="#436e77", font=("Arial Bold", 20), text_color="white", width=200, cursor="hand2", command=button_login_press)
     button_login.grid(row=0, column=1, sticky="e", padx=25, pady=(0,10))
 
+    app.minsize(app.winfo_width(), app.winfo_height())
     app.mainloop()
     
 if __name__ == "__main__":
