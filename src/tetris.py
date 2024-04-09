@@ -1,6 +1,5 @@
 # Imports
 import tkinter as tk
-import playsound as ps
 import time
 
 # Grid size parameters
@@ -11,9 +10,9 @@ CELL_SIZE = 30
 # Colors parameters 
 BACKGROUND_COLOR = "black"
 GRID_COLOR = "gray"
-BLOCK_COLORS = ["blue", "green", "red", "yellow", "orange", "purple", "cyan"]
+BLOCK_COLORS = ["#0077D3", "#53DA3F", "#FD3F59", "#FF910C  ", "#FE4819", "#78256F", " #485DC5"]
 
-# Template of the tetris blocks for each shape
+# Template of the tetris blocks for each shape  
 TETRIS_SHAPES = [
     # L piece
     [(0, 0), (0, 1), (0, 2), (1, 2)], 
@@ -31,7 +30,7 @@ TETRIS_SHAPES = [
     [(0, 0), (0, 1), (0, 2), (0, 3)]
 ]
 
-def create_tetris_playfield():
+def create_tetris_playfield() -> None:
     """
     This function creates the tetris playfield on the screen.
 
@@ -60,7 +59,7 @@ def create_tetris_playfield():
             x1, y1 = x0 + CELL_SIZE, y0 + CELL_SIZE # Calculate the ending position of the rectangle
             playfield_canvas.create_rectangle(x0, y0, x1, y1, outline=GRID_COLOR) # Draw the rectangle
 
-def draw_block(x, y, color):
+def draw_block(x : int, y : int, color : int) -> None:
     """
     This function is used to draw a block on the tetris playfield.
 
@@ -83,30 +82,33 @@ def draw_block(x, y, color):
     # Dessiner le bloc
     playfield_canvas.create_rectangle(x0, y0, x1, y1, fill=color, outline="black")
 
-def draw_tetris_piece(x, y, shape_index):
+def draw_tetris_piece(x : int , y : int , shape_index : int, state : bool = True) -> list:
     """
     This function draws a block on the tetris playfield .
 
     Args:
-        x (int): The x position of the block
-        y (int): The y position of the block
-        color (str): The color of the block
-
+        x : The x position of the block
+        y : The y position of the block
+        shape_index : The color and shape of the block
+        state : Check if we have to del or not 
     Returns:
-        Piece
+        shape 
 
     """
     global piece, shape, color
     # Select color for the piece and get the shape of the piece
-    color = BLOCK_COLORS[shape_index % len(BLOCK_COLORS)]  
-    shape = TETRIS_SHAPES[shape_index]  
-    
+    if state:
+        color = BLOCK_COLORS[shape_index % len(BLOCK_COLORS)]  
+        shape = TETRIS_SHAPES[shape_index] 
+    else:
+        color = "black" 
+        shape = TETRIS_SHAPES[shape_index]
     # Draw each block of the piece
     for block in shape:
         piece = draw_block(x + block[0], y + block[1], color)
     return shape
 
-def move_piece(direction):
+def move_piece(direction : str) -> None:
     """
     This function moves the Tetris piece horizontally.
 
@@ -126,14 +128,16 @@ def move_piece(direction):
         actual_piece[0] += 1
     elif direction == "down":
         actual_piece[1] += 1
+    del_piece(actual_piece)
+    create_tetris_playfield()
     draw_tetris_piece(actual_piece[0], actual_piece[1], actual_piece[2])
 
-def key_press(event):
+def key_press(event : tk.Event) -> None:
     """
     This function handles the key press events.
 
     Args:
-        event (tk.Event): The event object containing information about the key press.
+        event: The event object containing information about the key press.
 
     Returns:
         None
@@ -149,6 +153,77 @@ def key_press(event):
         # Move the piece right when right arrow key is pressed
         move_piece("down")
 
+def del_piece(piece : list) -> None:
+    draw_tetris_piece(actual_piece[0], actual_piece[1], actual_piece[2], False)
+
+def piece_collides(piece : list ) -> bool:  
+    """
+    Check if the piece collides with the already placed blocks.
+
+    Args:
+        piece (list): The current piece to check.
+
+    Returns:
+        bool: True if collision occurs, False otherwise.
+    """
+    # Check each block of the piece
+    for block in TETRIS_SHAPES[piece[2]]:
+        # Calculate the absolute position of the block
+        abs_x = piece[0] + block[0]
+        abs_y = piece[1] + block[1]
+        # Check if the absolute position is occupied by another block
+        if abs_x < 0 or abs_x >= GRID_WIDTH or abs_y >= GRID_HEIGHT or (abs_y >= 0 and playfield_canvas[abs_x][abs_y] != 0):
+            return True
+    return False
+
+def piece_hits_bottom(piece):
+    """
+    Check if the piece hits the bottom of the playfield.
+
+    Args:
+        piece (list): The current piece to check.
+
+    Returns:
+        bool: True if the piece hits the bottom, False otherwise.
+    """
+    # Check each block of the piece
+    for block in TETRIS_SHAPES[piece[2]]:
+        # Calculate the absolute position of the block
+        abs_y = piece[1] + block[1]
+        # Check if the absolute position is at or below the bottom
+        if abs_y >= GRID_HEIGHT:
+            return True
+    return False
+
+def game_loop():
+    global actual_piece
+
+    while True:
+        # Move the piece down
+        actual_piece[1] += 1
+        
+        # Check for collision or reaching the bottom
+        if piece_collides(actual_piece) or piece_hits_bottom(actual_piece):
+            # Revert the last move
+            actual_piece[1] -= 1
+            # Draw the piece at its current position
+            draw_tetris_piece(actual_piece[0], actual_piece[1], actual_piece[2])
+            # Break the loop to stop the piece from moving further
+            break
+        
+        # Delete the previous piece
+        del_piece(actual_piece)
+        
+        # Create and draw the updated piece
+        create_tetris_playfield()
+        draw_tetris_piece(actual_piece[0], actual_piece[1], actual_piece[2])
+        
+        # Update the Tkinter window
+        app.update()
+        
+        # Add a slight delay to control the speed of the game
+        time.sleep(0.2)
+
 def main():
     """
     This function is the main function of the application.
@@ -162,24 +237,21 @@ def main():
     global app, window_width, window_height, actual_piece 
 
     app = tk.Tk() 
-    ps.playsound("\song\TetrisSong.wav")
     app.attributes("-fullscreen", True)
     window_width = app.winfo_screenwidth()
     window_height = app.winfo_screenheight()
 
     create_tetris_playfield()  
-    actual_piece = [GRID_WIDTH // 2, 0, 0]  # Initial position of the piece
+    actual_piece = [GRID_WIDTH // 2, 0, 5]  # Initial position of the piece
 
     draw_tetris_piece(actual_piece[0], actual_piece[1], actual_piece[2])
-
+    
     # Bind key press events to the key_press function
     app.bind("<KeyPress>", key_press)
-
-    app.mainloop() 
-
-def game_loop():
-    pass
+    
+    app.mainloop()
+    game_loop()
 
 if __name__ == "__main__":
     main()
-    game_loop()
+    
