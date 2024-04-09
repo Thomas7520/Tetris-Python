@@ -1,5 +1,4 @@
-import tkinter as tk
-import random, asyncio, threading ,time
+import tkinter as tk,random as rd, threading as th ,time as t 
 
 
 # Grid size parameters
@@ -193,7 +192,7 @@ def generate_piece():
     Returns:
         list: The newly generated piece.
     """
-    return [GRID_WIDTH // 2, 0, random.randint(0, len(TETRIS_SHAPES) - 1)]
+    return [GRID_WIDTH // 2, 0, rd.randint(0, len(TETRIS_SHAPES) - 1)]
 
 def move_piece_down():
     """
@@ -235,8 +234,7 @@ def game_loop():
             del_piece(actual_piece)
             move_piece("down")
             app.update()
-            time.sleep(0.5)
-            # Draw the piece in its new position
+            t.sleep(0.5)
             draw_tetris_piece(actual_piece[0], actual_piece[1], actual_piece[2])
             
 def start_game_loop_in_thread():
@@ -249,7 +247,7 @@ def start_game_loop_in_thread():
     Returns:
         None
     """
-    game_thread = threading.Thread(target = game_loop)
+    game_thread = th.Thread(target = game_loop)
     game_thread.daemon = True 
     game_thread.start()
 
