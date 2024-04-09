@@ -2,8 +2,8 @@ import os, re
 from PIL import Image, ImageTk
 
 
-chemin_images = os.path.abspath(os.path.join(os.getcwd(), "images"))
-
+root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+image_path = os.path.join(root_path, "images")
 
 def is_valid_email(email):
     return re.compile(r'^[\w\.-]+@[\w\.-]+\.\w+$').match(email)
@@ -57,5 +57,5 @@ def get_image(name: str, width: int, height: int) -> ImageTk.PhotoImage:
         ImageTk.PhotoImage: The resized image.
 
     """
-    return ImageTk.PhotoImage(Image.open(f"{chemin_images}/{name}").resize((width, height)))
+    return ImageTk.PhotoImage(Image.open(f"{image_path}\\{name}").resize((width, height)))
     

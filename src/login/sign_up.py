@@ -1,5 +1,5 @@
 import customtkinter
-import os, sys
+import os, sys, time
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import utils
@@ -14,9 +14,10 @@ def label_new_account_hover_off(event):
     app.config(cursor="")
 
 def open_new_account_window(event):
+    import sign_in
     app.destroy()
-    chemin_login = os.path.abspath(os.path.join(os.getcwd(), "src\\login"))
-    exec(open(f"{chemin_login}\\sign_in.py").read())
+
+    sign_in.run()
 
 
 def button_login_press():
@@ -27,41 +28,37 @@ def run():
     app = customtkinter.CTk()
     app.title("Login")
     app.config(background='#96B5BA')
+    app.geometry("600x600")
+    app.resizable(0,0)
 
     app.grid_rowconfigure(0, weight=1)
     app.grid_rowconfigure(1, weight=1)
     app.grid_rowconfigure(2, weight=1)
     app.grid_columnconfigure(0, weight=1)
-    app.grid_columnconfigure(1, weight=1)
-    app.grid_columnconfigure(1, weight=1, minsize=600) #Taille minimale du login canva cohérente
+    app.grid_columnconfigure(1, weight=1, minsize=550) #Taille minimale du login canva cohérente
     app.grid_columnconfigure(2, weight=1)
-    app.update()
 
 
     # Pour éviter que le login canva prenne toute la place en y, il faut introduire des canvas dans les 2 grilles à gauche et à droite
-    fill_left_canvas = customtkinter.CTkCanvas(app, background=app["background"],highlightthickness=0,width=20)
+    fill_left_canvas = customtkinter.CTkCanvas(app, background=app["background"], highlightthickness=0, width=20)
     fill_left_canvas.grid(row=1, column=0, sticky="NSEW")
 
-    fill_right_canvas = customtkinter.CTkCanvas(app, background=app["background"],highlightthickness=0,width=20)
+    fill_right_canvas = customtkinter.CTkCanvas(app, background=app["background"], highlightthickness=0, width=20)
     fill_right_canvas.grid(row=1, column=2, sticky="NSEW")
 
+    fill_bottom_canvas = customtkinter.CTkCanvas(app, background=app["background"], highlightthickness=0, height=20)
+    fill_bottom_canvas.grid(row=2, column=1, sticky="NEW")
 
     image_canvas = customtkinter.CTkCanvas(app, background="#96B5BA", highlightthickness=0)
     image_canvas.grid(row=0, column=1, sticky="N")
-    image_canvas.update()
 
     title_image = utils.get_image("title_tetris.png", 512, 153)
 
-    title_x = (image_canvas.winfo_width() - title_image.width()) / 2
-    title_y = 25
-
     image_title_label = customtkinter.CTkLabel(master=image_canvas, text="", image=title_image, bg_color="#96B5BA")
     image_title_label.grid(row=0, column=0, pady=20)
-    image_title_label.update()
 
     login_canvas = customtkinter.CTkCanvas(app, background="white", highlightthickness=0)
     login_canvas.grid(row=1, column=1, sticky="NSEW")
-    login_canvas.update()
 
     login_canvas.grid_rowconfigure(0, weight=1)
     login_canvas.grid_rowconfigure(1, weight=1)
@@ -82,13 +79,11 @@ def run():
     frame_components.grid_rowconfigure(2, weight=1)
 
     frame_components.grid(row=1, column=0, sticky="nsew", pady=10)
-    frame_components.update()
 
 
     username_entry = customtkinter.CTkEntry(master=frame_components, placeholder_text="Pseudo", height=70 ,fg_color="#D9D9D9", corner_radius=0, border_color="#D9D9D9", bg_color="#D9D9D9",text_color="#9A9A9A", font=("", 20))
     username_entry.image = utils.get_image("user_icon.png", 64, 64)
     username_entry.grid(row=0, column=0, sticky="sew", padx=(25,0), pady=5)
-    username_entry.update()
 
     image_username_label = customtkinter.CTkLabel(frame_components, text="", width=0,height=70, image=username_entry.image, fg_color="#D9D9D9", bg_color="#D9D9D9")
     image_username_label.grid(row=0, column=1, sticky="se", padx=(0,25), pady=5)
@@ -96,7 +91,6 @@ def run():
     password_entry = customtkinter.CTkEntry(master=frame_components, placeholder_text="Mot de passe", height=70 ,fg_color="#D9D9D9", corner_radius=0, border_color="#D9D9D9", bg_color="#D9D9D9",text_color="#9A9A9A", show='*', font=("", 20))
     password_entry.image = utils.get_image("password_icon.png", 64, 64)
     password_entry.grid(row=1, column=0, sticky="sew", padx=(25,0), pady=5)
-    password_entry.update()
 
     image_password_label = customtkinter.CTkLabel(frame_components, text="", height=70, image=password_entry.image, fg_color="#D9D9D9", bg_color="#D9D9D9")
     image_password_label.grid(row=1, column=1, sticky="se", padx=(0,25), pady=5)
@@ -107,7 +101,6 @@ def run():
     frame_components_bottom.grid_columnconfigure(1, weight=1)
     frame_components_bottom.grid_rowconfigure(1, weight=1)
     frame_components_bottom.grid(row=3, column=0, sticky="nswe")
-    frame_components_bottom.update()
 
     global label_create_account
     label_create_account = customtkinter.CTkLabel(master=frame_components_bottom, text="Créer un compte",text_color="#9A9A9A", fg_color="white", bg_color="white",font=("Arial Bold", 20))
@@ -115,13 +108,9 @@ def run():
     label_create_account.bind("<Leave>", label_new_account_hover_off)
     label_create_account.bind("<Button-1>", open_new_account_window)
     label_create_account.grid(row=0, column=0, sticky="w", padx=25, pady=(0,10))
-    label_create_account.update()
 
     button_login = customtkinter.CTkButton(master=frame_components_bottom,text="Se connecter", corner_radius=0, height=65, bg_color="#67E9DA", fg_color="#67E9DA", hover_color="#436e77", font=("Arial Bold", 20), text_color="white", width=200, cursor="hand2", command=button_login_press)
     button_login.grid(row=0, column=1, sticky="e", padx=25, pady=(0,10))
-    button_login.update()
-
-    app.minsize(app.winfo_width(), app.winfo_height()) # Avant c'était window_height et window_width mais ça semble rendre mieux ainsi, à voir
 
     app.mainloop()
     
