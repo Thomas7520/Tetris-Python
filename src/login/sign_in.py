@@ -31,22 +31,22 @@ def run():
     app.title("Login")
     app.config(background='#96B5BA')
 
-    app.grid_rowconfigure(0, weight=1)
+    app.grid_rowconfigure(0, weight=1, minsize=20)
     app.grid_rowconfigure(1, weight=1)
-    app.grid_rowconfigure(2, weight=1)
+    app.grid_rowconfigure(2, weight=1, minsize=20)
     app.grid_columnconfigure(0, weight=1)
-    app.grid_columnconfigure(1, weight=1, minsize=550) #Taille minimale du login canva cohérente
+    app.grid_columnconfigure(1, weight=1, minsize=700) #Taille minimale du login canva cohérente
     app.grid_columnconfigure(2, weight=1)
 
 
     # Pour éviter que le login canva prenne toute la place en y, il faut introduire des canvas dans les 2 grilles à gauche et à droite
-    fill_left_canvas = customtkinter.CTkCanvas(app, background=app["background"],highlightthickness=0, width=20)
+    fill_left_canvas = customtkinter.CTkCanvas(app, background=app["background"],highlightthickness=0, width=60)
     fill_left_canvas.grid(row=1, column=0, sticky="NSEW")
 
-    fill_right_canvas = customtkinter.CTkCanvas(app, background=app["background"],highlightthickness=0, width=20)
+    fill_right_canvas = customtkinter.CTkCanvas(app, background=app["background"],highlightthickness=0, width=60)
     fill_right_canvas.grid(row=1, column=2, sticky="NSEW")
 
-    fill_bottom_canvas = customtkinter.CTkCanvas(app, background=app["background"],highlightthickness=0, height=20)
+    fill_bottom_canvas = customtkinter.CTkCanvas(app, background=app["background"],highlightthickness=0, height=40)
     fill_bottom_canvas.grid(row=2, column=1, sticky="NEW")
 
     image_canvas = customtkinter.CTkCanvas(app, background="#96B5BA", highlightthickness=0)
