@@ -1,9 +1,12 @@
-import os, re
+import os, re, csv
 from PIL import Image, ImageTk
 
 
 root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 image_path = os.path.join(root_path, "images")
+database_root = os.path.join(root_path, "database")
+database_name = "database.csv"
 
 def is_valid_email(email):
     return re.compile(r'^[\w\.-]+@[\w\.-]+\.\w+$').match(email)
@@ -59,3 +62,32 @@ def get_image(name: str, width: int, height: int) -> ImageTk.PhotoImage:
     """
     return ImageTk.PhotoImage(Image.open(f"{image_path}\\{name}").resize((width, height)))
     
+
+def get_users_csv(path: str) -> list:
+    with open(path, 'r') as file:
+        users_list = []
+        reader = csv.reader(file, delimiter=';')
+        for row in reader:
+            users_list.append(row)
+    return users_list
+
+def write_csv(path: str, new_user: list) -> None:
+        with open(path, 'w', newline='') as file:
+            writer = csv.writer(file, delimiter=';')
+            writer.writerow(new_user)
+            
+
+def has_account(username : str) -> bool:
+    for user in get_users_csv(database_root + "\\" + database_name):
+        if username in user:
+            return True
+    return False
+
+def check_password(username : str, password : str) -> bool:
+    for user in get_users_csv(database_root + "\\" + database_name):
+        if username in user:
+            if password == user[1]:
+                return True
+            else:
+                return False
+    return False
