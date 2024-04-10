@@ -109,7 +109,7 @@ def move_piece(direction):
     elif direction == "down":
         actual_piece[1] += 1
 
-    if piece_collides(actual_piece) or piece_hits_bottom(actual_piece):
+    if piece_hits_bottom(actual_piece):
         if direction == "left":
             actual_piece[0] += 1
         elif direction == "right":
@@ -149,8 +149,8 @@ def del_piece(piece):
     """
     playfield_canvas.delete("maPiece")
 
-def piece_collides(piece):
-    """
+"""def piece_collides(piece):
+    
     This function checks if the current piece collides with other pieces on the playfield.
 
     Args:
@@ -158,13 +158,13 @@ def piece_collides(piece):
 
     Returns:
         bool: True if collision occurs, False otherwise.
-    """
+    
     for block in TETRIS_SHAPES[piece[2]]:
         abs_x = piece[0] + block[0]
         abs_y = piece[1] + block[1]
         if abs_x < 0 or abs_x >= GRID_WIDTH or abs_y >= GRID_HEIGHT or (abs_y >= 0 and playfield_canvas.find_enclosed(abs_x * CELL_SIZE, abs_y * CELL_SIZE, (abs_x + 1) * CELL_SIZE, (abs_y + 1) * CELL_SIZE)):
             return True
-    return False
+    return False"""
 
 def piece_hits_bottom(piece):
     """
@@ -178,6 +178,8 @@ def piece_hits_bottom(piece):
     """
     for block in TETRIS_SHAPES[piece[2]]:
         abs_y = piece[1] + block[1]
+        print(abs_y)
+        print(abs_y >= GRID_HEIGHT)
         if abs_y >= GRID_HEIGHT:
             return True
     return False
@@ -209,9 +211,22 @@ def move_piece_down():
     move_piece("down")
 
     # Check if the piece has reached the bottom
-    if not piece_hits_bottom(actual_piece) and not piece_collides(actual_piece):
+    if not piece_hits_bottom(actual_piece):
         # Schedule the next movement down after a delay
         app.after(10, move_piece_down)
+
+def lock_piece():
+    """
+    This function locks the current piece when she hits something.
+
+    Args:
+        None
+    """
+    if piece_hits_bottom (actual_piece):
+        draw_tetris_piece(actual_piece[0], actual_piece[1], actual_piece[2], True)
+        actual_piece = generate_piece()
+    
+    draw_tetris_piece(actual_piece[0], actual_piece[1], actual_piece[2], True)
 
 def game_loop():
     """
@@ -234,8 +249,9 @@ def game_loop():
             del_piece(actual_piece)
             move_piece("down")
             app.update()
-            t.sleep(0.5)
             draw_tetris_piece(actual_piece[0], actual_piece[1], actual_piece[2])
+            t.sleep(0.5)
+        lock_piece()
             
 def start_game_loop_in_thread():
     """
