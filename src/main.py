@@ -13,8 +13,8 @@ if __name__ == "__main__":
     if not os.path.isdir(database_root):
         os.mkdir(database_root)
     
-    dict_test = ["test@gmail.com", "oqjof^z", "test"]
-    utils.write_csv(dict_test)
+    #dict_test = ["test@gmail.com", "oqjof^z", "test"]
+    #utils.write_csv(dict_test)
         
     print(utils.get_users_csv(os.path.join(database_root, "database.csv")))
     

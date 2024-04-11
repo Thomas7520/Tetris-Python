@@ -1,11 +1,12 @@
 import os, re, csv
 from PIL import Image, ImageTk
 
+from pathlib import Path
 
-root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-image_path = os.path.join(root_path, "images")
-database_path = os.path.join(root_path, "database")
+root_path = Path(__file__).resolve().parent.parent
+image_path = root_path / "images"
+database_path = root_path / "database"
 database_name = "database.csv"
 
 def is_valid_email(email):
