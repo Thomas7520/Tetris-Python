@@ -113,8 +113,7 @@ def draw_block_definitly(x, y, color):
     """
     x0, y0 = x * CELL_SIZE, y * CELL_SIZE
     x1, y1 = x0 + CELL_SIZE, y0 + CELL_SIZE
-    playfield_canvas.create_rectangle(
-        x0, y0, x1, y1, fill=color, outline="black")
+    playfield_canvas.create_rectangle(x0, y0, x1, y1, fill=color, outline="black")
 
 def draw_tetris_pieces_definitly(x,y,shape_index):
     """
@@ -138,19 +137,22 @@ locked_blocks = []
 
 def lock_piece():
     global actual_piece
-    # Verrouillez la pièce en place
+
     secondary_list = []
     for block in TETRIS_SHAPES[actual_piece[2]]:
         abs_x = actual_piece[0] + block[0]
         abs_y = actual_piece[1] + block[1]
         secondary_list.append((abs_x, abs_y))
     locked_blocks.append(secondary_list)
-    # Générer une nouvelle pièce
+
     draw_tetris_pieces_definitly(actual_piece[0], actual_piece[1]-1, actual_piece[2])
     actual_piece = generate_piece()
     draw_tetris_piece(actual_piece[0], actual_piece[1], actual_piece[2])
     print(locked_blocks)
     
+def piece_colision(piece):
+   pass
+   
 def piece_hits_side(piece, direction):
     """
     Cette fonction vérifie si la pièce atteint le côté gauche ou droit du terrain de jeu.
