@@ -139,10 +139,12 @@ locked_blocks = []
 def lock_piece():
     global actual_piece
     # Verrouillez la pièce en place
+    secondary_list = []
     for block in TETRIS_SHAPES[actual_piece[2]]:
         abs_x = actual_piece[0] + block[0]
         abs_y = actual_piece[1] + block[1]
-        locked_blocks.append([(abs_x, abs_y)])
+        secondary_list.append((abs_x, abs_y))
+    locked_blocks.append(secondary_list)
     # Générer une nouvelle pièce
     draw_tetris_pieces_definitly(actual_piece[0], actual_piece[1]-1, actual_piece[2])
     actual_piece = generate_piece()
