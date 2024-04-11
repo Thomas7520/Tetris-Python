@@ -3,9 +3,11 @@ from PIL import Image, ImageTk
 
 from pathlib import Path
 
-
+global root_path, image_path, database_path, database_name, login_path
 root_path = Path(__file__).resolve().parent.parent
 image_path = root_path / "images"
+login_path = root_path / "src/login"
+
 database_path = root_path / "database"
 database_name = "database.csv"
 
@@ -64,6 +66,9 @@ def get_image(name: str, width: int, height: int) -> ImageTk.PhotoImage:
     return ImageTk.PhotoImage(Image.open(f"{image_path}\\{name}").resize((width, height)))
     
 
+def exec_python(path_script: str) -> None:
+    os.system("python " + path_script)
+    
 def get_users_csv(path: str) -> list:
     with open(path, 'r') as file:
         users_list = []

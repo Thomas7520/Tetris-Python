@@ -5,6 +5,7 @@ import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import utils
 
+sign_up_script = os.path.join(utils.login_path, "sign_up.py")
     
 def label_new_account_hover_on(event):
     label_create_account.configure(text_color="#2e2e2e")
@@ -16,14 +17,7 @@ def label_new_account_hover_off(event):
 
 def open_new_account_window(event):
     app.destroy()
-
-    # Récupère le chemin absolu du dossier courant
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-
-    # Construit le chemin absolu du fichier sign_up.py
-    sign_up_script = os.path.join(current_dir, "sign_up.py")
-
-    os.system("python " + sign_up_script)
+    utils.exec_python(sign_up_script)
 
 def perform_register():
     if not username_entry.get():
