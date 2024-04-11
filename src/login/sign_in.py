@@ -17,9 +17,13 @@ def label_new_account_hover_off(event):
 def open_new_account_window(event):
     app.destroy()
 
-    import sign_up
-    sign_up.run()
+    # Récupère le chemin absolu du dossier courant
+    current_dir = os.path.dirname(os.path.abspath(__file__))
 
+    # Construit le chemin absolu du fichier sign_up.py
+    sign_up_script = os.path.join(current_dir, "sign_up.py")
+
+    os.system("python " + sign_up_script)
 
 def perform_register():
     if not username_entry.get():
@@ -40,8 +44,8 @@ def perform_register():
 
 def run():
     global app 
-    app = customtkinter.CTk()
 
+    app = customtkinter.CTk()
     app.title("Login")
     app.config(background='#96B5BA')
 

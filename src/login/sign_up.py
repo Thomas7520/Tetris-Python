@@ -1,7 +1,7 @@
 import customtkinter
 import CTkMessagebox
 
-import os, sys, time
+import os, sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import utils
@@ -16,10 +16,16 @@ def label_new_account_hover_off(event):
     app.config(cursor="")
 
 def open_new_account_window(event):
-    import sign_in
     app.destroy()
+    
+    # Récupère le chemin absolu du dossier courant
+    current_dir = os.path.dirname(os.path.abspath(__file__))
 
-    sign_in.run()
+    # Construit le chemin absolu du fichier sign_up.py
+    sign_up_script = os.path.join(current_dir, "sign_in.py")
+
+    os.system("python " + sign_up_script)
+    
 
 
 def perform_login():
@@ -34,6 +40,7 @@ def perform_login():
     
 def run():
     global app 
+
     app = customtkinter.CTk()
     app.title("Login")
     app.config(background='#96B5BA')

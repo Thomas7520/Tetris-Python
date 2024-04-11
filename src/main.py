@@ -5,7 +5,7 @@ sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "login"
 import sign_up
 
 if __name__ == "__main__":
-    #sign_up.run()
+    sign_up.run()
     
     root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     database_root = os.path.join(root_path, "database")
