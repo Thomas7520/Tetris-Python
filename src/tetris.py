@@ -144,7 +144,7 @@ def lock_piece():
         abs_y = actual_piece[1] + block[1]
         locked_blocks.append([(abs_x, abs_y)])
     # Générer une nouvelle pièce
-    draw_tetris_pieces_definitly(actual_piece[0], actual_piece[1], actual_piece[2])
+    draw_tetris_pieces_definitly(actual_piece[0], actual_piece[1]-1, actual_piece[2])
     actual_piece = generate_piece()
     draw_tetris_piece(actual_piece[0], actual_piece[1], actual_piece[2])
     print(locked_blocks)
