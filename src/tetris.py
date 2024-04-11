@@ -1,4 +1,7 @@
-import tkinter as tk,random as rd, threading as th ,time as t 
+import tkinter as tk
+import random as rd
+import threading as th
+import time as t
 
 
 # Grid size parameters
@@ -6,15 +9,16 @@ GRID_WIDTH = 10
 GRID_HEIGHT = 24
 CELL_SIZE = 30
 
-# Colors parameters 
+# Colors parameters
 BACKGROUND_COLOR = "black"
 GRID_COLOR = "gray"
-BLOCK_COLORS = ["#0077D3", "#53DA3F", "#FD3F59", "#FF910C", "#FE4819", "#78256F", "#485DC5"]
+BLOCK_COLORS = ["#0077D3", "#53DA3F", "#FD3F59",
+                "#FF910C", "#FE4819", "#78256F", "#485DC5"]
 
-# Template of the tetris blocks for each shape  
+# Template of the tetris blocks for each shape
 TETRIS_SHAPES = [
     # L piece
-    [(0, 0), (0, 1), (0, 2), (1, 2)], 
+    [(0, 0), (0, 1), (0, 2), (1, 2)],
     # Square piece
     [(0, 0), (1, 0), (0, 1), (1, 1)],
     # T piece
@@ -29,6 +33,7 @@ TETRIS_SHAPES = [
     [(0, 0), (0, 1), (0, 2), (0, 3)]
 ]
 
+
 def create_tetris_playfield():
     """
     This function creates the tetris playfield on the screen.
@@ -39,18 +44,21 @@ def create_tetris_playfield():
     Returns:
         None
     """
-    global playfield_canvas 
+    global playfield_canvas
 
     # Create the canvas to display the playfield and place it on the center of the screen
-    playfield_canvas = tk.Canvas(app, width=GRID_WIDTH * CELL_SIZE, height=GRID_HEIGHT * CELL_SIZE, bg=BACKGROUND_COLOR) 
-    playfield_canvas.place(relx=0.5, rely=0.5, anchor="center") 
+    playfield_canvas = tk.Canvas(
+        app, width=GRID_WIDTH * CELL_SIZE, height=GRID_HEIGHT * CELL_SIZE, bg=BACKGROUND_COLOR)
+    playfield_canvas.place(relx=0.5, rely=0.5, anchor="center")
 
     # Draw the grid
     for y in range(GRID_HEIGHT):
         for x in range(GRID_WIDTH):
             x0, y0 = x * CELL_SIZE, y * CELL_SIZE
             x1, y1 = x0 + CELL_SIZE, y0 + CELL_SIZE
-            playfield_canvas.create_rectangle(x0, y0, x1, y1, outline=GRID_COLOR)
+            playfield_canvas.create_rectangle(
+                x0, y0, x1, y1, outline=GRID_COLOR)
+
 
 def draw_block(x, y, color):
     """
@@ -66,8 +74,9 @@ def draw_block(x, y, color):
     """
     x0, y0 = x * CELL_SIZE, y * CELL_SIZE
     x1, y1 = x0 + CELL_SIZE, y0 + CELL_SIZE
-    playfield_canvas.create_rectangle(x0, y0, x1, y1, fill=color, outline="black", tag="maPiece")
-
+    playfield_canvas.create_rectangle(
+        x0, y0, x1, y1, fill=color, outline="black", tag="maPiece")
+       
 def draw_tetris_piece(x, y, shape_index, state=True):
     """
     This function draws a tetris piece on the playfield.
@@ -90,34 +99,94 @@ def draw_tetris_piece(x, y, shape_index, state=True):
         for block in TETRIS_SHAPES[shape_index]:
             draw_block(x + block[0], y + block[1], BACKGROUND_COLOR)
 
-def move_piece(direction):
+def draw_block_definitly(x, y, color):
     """
-    This function moves the current tetris piece.
+    This function draws a block on the tetris playfield.
 
     Args:
-        direction (str): The direction of movement ("left" or "right").
+        x (int): The x position of the block
+        y (int): The y position of the block
+        color (str): The color of the block
 
     Returns:
         None
     """
+    x0, y0 = x * CELL_SIZE, y * CELL_SIZE
+    x1, y1 = x0 + CELL_SIZE, y0 + CELL_SIZE
+    playfield_canvas.create_rectangle(
+        x0, y0, x1, y1, fill=color, outline="black")
+
+def draw_tetris_pieces_definitly(x,y,shape_index):
+    """
+    This function draws a tetris piece on the playfield.
+
+    Args:
+        x (int): The x position of the piece
+        y (int): The y position of the piece
+        shape_index (int): The index of the shape in the TETRIS_SHAPES list
+        state (bool): True to draw the piece, False to delete it
+
+    Returns:
+        None
+    """
+    color = BLOCK_COLORS[shape_index % len(BLOCK_COLORS)]
+    shape = TETRIS_SHAPES[shape_index]
+    for block in shape:
+        draw_block_definitly(x + block[0], y + block[1], color)
+
+locked_blocks = []
+
+def lock_piece():
+    global actual_piece
+    # Verrouillez la pièce en place
+    for block in TETRIS_SHAPES[actual_piece[2]]:
+        abs_x = actual_piece[0] + block[0]
+        abs_y = actual_piece[1] + block[1]
+        locked_blocks.append([(abs_x, abs_y)])
+    # Générer une nouvelle pièce
+    draw_tetris_pieces_definitly(actual_piece[0], actual_piece[1], actual_piece[2])
+    actual_piece = generate_piece()
+    draw_tetris_piece(actual_piece[0], actual_piece[1], actual_piece[2])
+    print(locked_blocks)
+    
+def piece_hits_side(piece, direction):
+    """
+    Cette fonction vérifie si la pièce atteint le côté gauche ou droit du terrain de jeu.
+
+    Args:
+        piece (list): La pièce actuelle.
+        direction (str): La direction à vérifier ("left" ou "right").
+
+    Returns:
+        bool: True si la pièce atteint le côté, False sinon.
+    """
+    for block in TETRIS_SHAPES[piece[2]]:
+        abs_x = piece[0] + block[0]
+        if direction == "left" and abs_x <= 0:
+            return True
+        elif direction == "right" and abs_x >= GRID_WIDTH - 1:
+            return True
+    return False
+
+def move_piece(direction):
     global actual_piece
 
     if direction == "left":
-        actual_piece[0] -= 1
+        if not piece_hits_side(actual_piece, "left"):
+            actual_piece[0] -= 1
     elif direction == "right":
-        actual_piece[0] += 1
+        if not piece_hits_side(actual_piece, "right"):
+            actual_piece[0] += 1
     elif direction == "down":
-        actual_piece[1] += 1
+        if not piece_hits_bottom(actual_piece):
+            actual_piece[1] += 1
 
     if piece_hits_bottom(actual_piece):
-        if direction == "left":
-            actual_piece[0] += 1
-        elif direction == "right":
-            actual_piece[0] -= 1
-        elif direction == "down":
-            actual_piece[1] -= 1
+        lock_piece()
+        
     del_piece(actual_piece)
     draw_tetris_piece(actual_piece[0], actual_piece[1], actual_piece[2])
+
 
 def key_press(event):
     """
@@ -137,6 +206,7 @@ def key_press(event):
     elif key == "Down":
         move_piece("down")
 
+
 def del_piece(piece):
     """
     This function deletes a tetris piece from the playfield.
@@ -148,6 +218,7 @@ def del_piece(piece):
         None
     """
     playfield_canvas.delete("maPiece")
+
 
 """def piece_collides(piece):
     
@@ -166,6 +237,7 @@ def del_piece(piece):
             return True
     return False"""
 
+
 def piece_hits_bottom(piece):
     """
     This function checks if the current piece hits the bottom of the playfield.
@@ -178,8 +250,6 @@ def piece_hits_bottom(piece):
     """
     for block in TETRIS_SHAPES[piece[2]]:
         abs_y = piece[1] + block[1]
-        print(abs_y)
-        print(abs_y >= GRID_HEIGHT)
         if abs_y >= GRID_HEIGHT:
             return True
     return False
@@ -195,6 +265,7 @@ def generate_piece():
         list: The newly generated piece.
     """
     return [GRID_WIDTH // 2, 0, rd.randint(0, len(TETRIS_SHAPES) - 1)]
+
 
 def move_piece_down():
     """
@@ -215,44 +286,23 @@ def move_piece_down():
         # Schedule the next movement down after a delay
         app.after(10, move_piece_down)
 
-def lock_piece():
-    """
-    This function locks the current piece when she hits something.
-
-    Args:
-        None
-    """
-    if piece_hits_bottom (actual_piece):
-        draw_tetris_piece(actual_piece[0], actual_piece[1], actual_piece[2], True)
-        actual_piece = generate_piece()
-    
-    draw_tetris_piece(actual_piece[0], actual_piece[1], actual_piece[2], True)
+def start_new_piece():
+    global actual_piece
+    actual_piece = generate_piece()
+    draw_tetris_piece(actual_piece[0], actual_piece[1], actual_piece[2])
 
 def game_loop():
-    """
-    This function implements the game loop.
-
-    Args:
-        None
-
-    Returns:
-        None
-    """
-    global actual_piece
     create_tetris_playfield()
+    start_new_piece()
 
     while True:
-        actual_piece = generate_piece()
-        draw_tetris_piece(actual_piece[0], actual_piece[1], actual_piece[2])
-
-        while not piece_hits_bottom(actual_piece):
-            del_piece(actual_piece)
-            move_piece("down")
-            app.update()
-            draw_tetris_piece(actual_piece[0], actual_piece[1], actual_piece[2])
-            t.sleep(0.5)
-        lock_piece()
-            
+        move_piece("down")
+        if piece_hits_bottom(actual_piece):
+            lock_piece()
+            start_new_piece()
+        app.update()
+        t.sleep(0.5)
+        
 def start_game_loop_in_thread():
     """
     This function starts the game loop in a separate thread.
@@ -263,9 +313,10 @@ def start_game_loop_in_thread():
     Returns:
         None
     """
-    game_thread = th.Thread(target = game_loop)
-    game_thread.daemon = True 
+    game_thread = th.Thread(target=game_loop)
+    game_thread.daemon = True
     game_thread.start()
+
 
 def main():
     """
@@ -287,7 +338,6 @@ def main():
 
     app.mainloop()
 
-    
+
 if __name__ == "__main__":
     main()
-    
