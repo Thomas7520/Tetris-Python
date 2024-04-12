@@ -81,8 +81,7 @@ def get_users_csv(path: str) -> list:
 
 def write_csv(new_user: list) -> None:
         with open(os.path.join(database_path, "database.csv"), 'a', newline='') as file:
-            hashed_password = bcrypt.hashpw(new_user[2].encode('utf-8'), bcrypt.gensalt())
-            print(hashed_password)
+            new_user[2] = bcrypt.hashpw(new_user[2].encode('utf-8'), bcrypt.gensalt())
             writer = csv.writer(file, delimiter=';')
             writer.writerow(new_user)
             
@@ -102,8 +101,13 @@ def email_exist(email : str) -> bool:
 def check_password(username : str, password : str) -> bool:
     for user in get_users_csv(os.path.join(database_path, "database.csv")):
         if username in user:
-            if bcrypt.checkpw(password, user[2]):
+            if bcrypt.checkpw(password.encode("utf-8"), bytes(user[2][2:-1], 'utf8')): # Pas le choix ainsi car le str est déjà encodé mais si on le reconverti il sera doublement encodé, ce que bcrypt ne va pas apprécier
                 return True
             else:
                 return False
     return False
+
+def create_empty_csv():
+    with open(os.path.join(database_path, "database.csv"), 'w', newline='') as csvfile:
+        csv_writer = csv.writer(csvfile)
+        csv_writer.writerow([])

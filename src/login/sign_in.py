@@ -32,9 +32,11 @@ def perform_register(event=None):
         CTkMessagebox.CTkMessagebox(title="Erreur", message="Le compte existe déjà", icon="warning")
     else:
         utils.write_csv([username_entry.get(), email_entry.get(), password_entry.get()])
-        pass
-    print("button pressed")
+        CTkMessagebox.CTkMessagebox(title="Login", message="Le compte a été crée avec succès", icon="check").get() #Le get permet de mettre en pause le programme jusqu'à ce que la fenêtre soit fermée
 
+        app.destroy()
+        utils.exec_python(sign_up_script)
+        
 
 def run():
     global app 

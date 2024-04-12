@@ -29,6 +29,7 @@ def perform_login(event=None):
     elif not utils.username_exist(username_entry.get()) or not utils.check_password(username_entry.get(), password_entry.get()):
         CTkMessagebox.CTkMessagebox(title="Erreur", message="Le nom d'utilisateur ou le mot de passe est incorrect", icon="warning")
     else:
+        CTkMessagebox.CTkMessagebox(title="Login", message="Connexion avec succès !", icon="check").get()
         utils.exec_python(main_menu_script, [username_entry.get()])
         app.destroy()
     
