@@ -33,6 +33,19 @@ TETRIS_SHAPES = [
     [(0, 0), (0, 1), (0, 2), (0, 3)]
 ]
 
+# Créer un dictionnaire pour stocker le nombre de fois que chaque pièce est sortie
+piece_counts = {i: 0 for i in range(len(TETRIS_SHAPES))}
+
+# Définir les pourcentages pour chaque pièce (vous pouvez ajuster ces valeurs selon vos préférences)
+piece_percentages = {
+    0: 10,   # L piece
+    1: 15,   # Square piece
+    2: 10,   # T piece
+    3: 15,   # Z piece
+    4: 15,   # S piece
+    5: 10,   # J piece
+    6: 25    # I piece
+}
 
 def create_tetris_playfield():
     """
@@ -51,6 +64,13 @@ def create_tetris_playfield():
         app, width=GRID_WIDTH * CELL_SIZE, height=GRID_HEIGHT * CELL_SIZE, bg=BACKGROUND_COLOR)
     playfield_canvas.place(relx=0.5, rely=0.5, anchor="center")
 
+    # Create rectangles to represent the last three pieces generated
+    piece_rectangles = []
+    for i in range(3):
+        rectangle = playfield_canvas.create_rectangle(
+            GRID_WIDTH * CELL_SIZE + 20, i * CELL_SIZE * 4 + 20, GRID_WIDTH * CELL_SIZE + 60, i * CELL_SIZE * 4 + 60, outline="black", width=2)
+        piece_rectangles.append(rectangle)
+
     # Draw the grid
     for y in range(GRID_HEIGHT):
         for x in range(GRID_WIDTH):
@@ -58,6 +78,8 @@ def create_tetris_playfield():
             x1, y1 = x0 + CELL_SIZE, y0 + CELL_SIZE
             playfield_canvas.create_rectangle(
                 x0, y0, x1, y1, outline=GRID_COLOR)
+            
+            
 
 
 def draw_block(x, y, color):
@@ -277,7 +299,12 @@ def piece_hits_bottom(piece):
     return False
 
 
+# Créer une liste pour stocker les trois dernières pièces générées
+last_three_pieces = []
+
 def generate_piece():
+    global last_three_pieces
+
     """
     This function generates a new tetris piece.
 
@@ -287,7 +314,33 @@ def generate_piece():
     Returns:
         list: The newly generated piece.
     """
-    return [GRID_WIDTH // 2, 0, rd.randint(0, len(TETRIS_SHAPES) - 1)]
+    # Calculer les pourcentages cumulés pour choisir une pièce en fonction des pourcentages
+    cumulative_percentages = [0] * len(TETRIS_SHAPES)
+    total_percentages = 0
+    for index, percentage in piece_percentages.items():
+        total_percentages += percentage
+        cumulative_percentages[index] = total_percentages
+
+    # Choisir un nombre aléatoire dans l'intervalle total des pourcentages
+    random_number = rd.randint(1, total_percentages)
+
+    # Trouver la pièce correspondant au nombre aléatoire
+    chosen_piece = 0
+    for index, cumulative_percentage in enumerate(cumulative_percentages):
+        if random_number <= cumulative_percentage:
+            chosen_piece = index
+            break
+
+    # Mettre à jour le nombre de fois que la pièce a été sortie
+    piece_counts[chosen_piece] += 1
+
+    # Stocker la pièce dans la liste FIFO
+    last_three_pieces.append(chosen_piece)
+    if len(last_three_pieces) > 3:
+        last_three_pieces.pop(0)
+
+    return [GRID_WIDTH // 2, 0, chosen_piece]
+
 
 
 def move_piece_down():
