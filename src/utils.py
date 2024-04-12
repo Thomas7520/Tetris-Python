@@ -71,7 +71,7 @@ def get_image(name: str, width: int, height: int) -> ImageTk.PhotoImage:
 def exec_python(path_script: str, args=[]) -> None:
     try:
         subprocess.Popen(['python', path_script] + args)
-    except e:
+    except FileNotFoundError:
         subprocess.Popen(['python3', path_script] + args)
 
     
