@@ -1,12 +1,12 @@
 import customtkinter
 import CTkMessagebox
-
 import os, sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import utils
 
 sign_in_script = os.path.join(utils.login_path, "sign_in.py")
+main_menu_script = os.path.join(utils.root_path, "src\\main_menu.py")
 
     
 def label_new_account_hover_on(event):
@@ -21,11 +21,7 @@ def open_new_account_window(event):
     app.destroy()
     utils.exec_python(sign_in_script)
 
-    
-    
-
-
-def perform_login():
+def perform_login(event=None):
     if not username_entry.get():
         CTkMessagebox.CTkMessagebox(title="Erreur", message="Veuillez saisir un pseudo", icon="warning")
     elif not password_entry.get():
@@ -33,7 +29,8 @@ def perform_login():
     elif not utils.username_exist(username_entry.get()) or not utils.check_password(username_entry.get(), password_entry.get()):
         CTkMessagebox.CTkMessagebox(title="Erreur", message="Le nom d'utilisateur ou le mot de passe est incorrect", icon="warning")
     else:
-        pass
+        utils.exec_python(main_menu_script, [username_entry.get()])
+        app.destroy()
     
 def run():
     global app 

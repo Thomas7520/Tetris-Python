@@ -1,4 +1,6 @@
 import os, re, csv
+import subprocess
+import bcrypt
 from PIL import Image, ImageTk
 
 from pathlib import Path
@@ -66,8 +68,8 @@ def get_image(name: str, width: int, height: int) -> ImageTk.PhotoImage:
     return ImageTk.PhotoImage(Image.open(f"{image_path}\\{name}").resize((width, height)))
     
 
-def exec_python(path_script: str) -> None:
-    os.system("python " + path_script)
+def exec_python(path_script: str, args=[]) -> None:
+    subprocess.Popen(['python', path_script] + args)
     
 def get_users_csv(path: str) -> list:
     with open(path, 'r') as file:
@@ -79,26 +81,28 @@ def get_users_csv(path: str) -> list:
 
 def write_csv(new_user: list) -> None:
         with open(os.path.join(database_path, "database.csv"), 'a', newline='') as file:
+            hashed_password = bcrypt.hashpw(new_user[2].encode('utf-8'), bcrypt.gensalt())
+            print(hashed_password)
             writer = csv.writer(file, delimiter=';')
             writer.writerow(new_user)
             
 
 def username_exist(username : str) -> bool:
-    for user in get_users_csv(database_path + "\\" + database_name):
+    for user in get_users_csv(os.path.join(database_path, "database.csv")):
         if username in user:
             return True
     return False
 
 def email_exist(email : str) -> bool:
-    for user in get_users_csv(database_path + "\\" + database_name):
+    for user in get_users_csv(os.path.join(database_path, "database.csv")):
         if email in user:
             return True
     return False
 
 def check_password(username : str, password : str) -> bool:
-    for user in get_users_csv(database_path + "\\" + database_name):
+    for user in get_users_csv(os.path.join(database_path, "database.csv")):
         if username in user:
-            if password == user[1]:
+            if bcrypt.checkpw(password, user[2]):
                 return True
             else:
                 return False

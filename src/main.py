@@ -16,8 +16,8 @@ if __name__ == "__main__":
     #dict_test = ["test@gmail.com", "oqjof^z", "test"]
     #utils.write_csv(dict_test)
         
-    print(utils.get_users_csv(os.path.join(database_root, "database.csv")))
+    """ print(utils.get_users_csv(os.path.join(database_root, "database.csv")))
     
     print(utils.username_exist("test"))
     
-    print(utils.check_password("test", "oqjof^z"))
+    print(utils.check_password("test", "oqjof^z"))"""

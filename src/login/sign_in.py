@@ -19,7 +19,7 @@ def open_new_account_window(event):
     app.destroy()
     utils.exec_python(sign_up_script)
 
-def perform_register():
+def perform_register(event=None):
     if not username_entry.get():
         CTkMessagebox.CTkMessagebox(title="Erreur", message="Veuillez saisir un pseudo !", icon="warning")
     elif not password_entry.get():
