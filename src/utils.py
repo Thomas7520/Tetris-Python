@@ -65,7 +65,7 @@ def get_image(name: str, width: int, height: int) -> ImageTk.PhotoImage:
         ImageTk.PhotoImage: The resized image.
 
     """
-    return ImageTk.PhotoImage(Image.open(f"{image_path}\\{name}").resize((width, height)))
+    return ImageTk.PhotoImage(Image.open(image_path / name).resize((width, height)))
     
 
 def exec_python(path_script: str, args=[]) -> None:
