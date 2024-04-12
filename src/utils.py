@@ -69,7 +69,11 @@ def get_image(name: str, width: int, height: int) -> ImageTk.PhotoImage:
     
 
 def exec_python(path_script: str, args=[]) -> None:
-    subprocess.Popen(['python', path_script] + args)
+    try:
+        subprocess.Popen(['python', path_script] + args)
+    except e:
+        subprocess.Popen(['python3', path_script] + args)
+
     
 def get_users_csv(path: str) -> list:
     with open(path, 'r') as file:
