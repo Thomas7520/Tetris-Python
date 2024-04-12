@@ -66,7 +66,8 @@ def run():
     app = customtkinter.CTk()
     app.title("Login")
     app.config(background='#96B5BA')
-
+    app.iconbitmap(utils.image_path / "tetris_icon.ico")
+    
     app.grid_rowconfigure(0, weight=1)
     app.grid_rowconfigure(1, weight=1)
     app.grid_rowconfigure(2, weight=1)
