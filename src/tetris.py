@@ -76,7 +76,8 @@ def draw_block(x, y, color):
     x1, y1 = x0 + CELL_SIZE, y0 + CELL_SIZE
     playfield_canvas.create_rectangle(
         x0, y0, x1, y1, fill=color, outline="black", tag="maPiece")
-       
+
+
 def draw_tetris_piece(x, y, shape_index, state=True):
     """
     This function draws a tetris piece on the playfield.
@@ -99,6 +100,7 @@ def draw_tetris_piece(x, y, shape_index, state=True):
         for block in TETRIS_SHAPES[shape_index]:
             draw_block(x + block[0], y + block[1], BACKGROUND_COLOR)
 
+
 def draw_block_definitly(x, y, color):
     """
     This function draws a block on the tetris playfield.
@@ -113,9 +115,11 @@ def draw_block_definitly(x, y, color):
     """
     x0, y0 = x * CELL_SIZE, y * CELL_SIZE
     x1, y1 = x0 + CELL_SIZE, y0 + CELL_SIZE
-    playfield_canvas.create_rectangle(x0, y0, x1, y1, fill=color, outline="black")
+    playfield_canvas.create_rectangle(
+        x0, y0, x1, y1, fill=color, outline="black")
 
-def draw_tetris_pieces_definitly(x,y,shape_index):
+
+def draw_tetris_pieces_definitly(x, y, shape_index):
     """
     This function draws a tetris piece on the playfield.
 
@@ -133,7 +137,9 @@ def draw_tetris_pieces_definitly(x,y,shape_index):
     for block in shape:
         draw_block_definitly(x + block[0], y + block[1], color)
 
+
 locked_blocks = []
+
 
 def lock_piece():
     global actual_piece
@@ -145,14 +151,43 @@ def lock_piece():
         secondary_list.append((abs_x, abs_y))
     locked_blocks.append(secondary_list)
 
-    draw_tetris_pieces_definitly(actual_piece[0], actual_piece[1]-1, actual_piece[2])
+    draw_tetris_pieces_definitly(
+        actual_piece[0], actual_piece[1]-1, actual_piece[2])
     actual_piece = generate_piece()
     draw_tetris_piece(actual_piece[0], actual_piece[1], actual_piece[2])
     print(locked_blocks)
-    
-def piece_colision(piece):
-   pass
-   
+
+
+def piece_colision(piece, direction):
+    """
+    Cette fonction vérifie si la pièce actuelle entre en collision avec d'autres pièces verrouillées sur le plateau de jeu.
+
+    Args:
+        piece (list): La pièce actuelle.
+        direction (str): La direction du mouvement ("left", "right", ou "down").
+
+    Returns:
+        bool: True si une collision est détectée, False sinon.
+    """
+    for block in TETRIS_SHAPES[piece[2]]:
+        abs_x = piece[0] + block[0]
+        abs_y = piece[1] + block[1]
+
+        # Vérifier si la pièce entre en collision avec une pièce verrouillée
+        for locked_piece in locked_blocks:
+            if direction == "down":
+                if (abs_x, abs_y + 1) in locked_piece:
+                    return True
+            elif direction == "left":
+                if (abs_x - 1, abs_y+1) in locked_piece:
+                    return True
+            elif direction == "right":
+                if (abs_x + 1, abs_y+1) in locked_piece:
+                    return True
+
+    return False
+
+
 def piece_hits_side(piece, direction):
     """
     Cette fonction vérifie si la pièce atteint le côté gauche ou droit du terrain de jeu.
@@ -172,22 +207,23 @@ def piece_hits_side(piece, direction):
             return True
     return False
 
+
 def move_piece(direction):
     global actual_piece
 
     if direction == "left":
-        if not piece_hits_side(actual_piece, "left"):
+        if not piece_hits_side(actual_piece, "left") and not piece_colision(actual_piece, "left"):
             actual_piece[0] -= 1
     elif direction == "right":
-        if not piece_hits_side(actual_piece, "right"):
+        if not piece_hits_side(actual_piece, "right") and not piece_colision(actual_piece, "right"):
             actual_piece[0] += 1
     elif direction == "down":
-        if not piece_hits_bottom(actual_piece):
+        if not piece_hits_bottom(actual_piece) and not piece_colision(actual_piece, "down"):
             actual_piece[1] += 1
 
-    if piece_hits_bottom(actual_piece):
+    if piece_hits_bottom(actual_piece) or piece_colision(actual_piece, "down"):
         lock_piece()
-        
+
     del_piece(actual_piece)
     draw_tetris_piece(actual_piece[0], actual_piece[1], actual_piece[2])
 
@@ -224,24 +260,6 @@ def del_piece(piece):
     playfield_canvas.delete("maPiece")
 
 
-"""def piece_collides(piece):
-    
-    This function checks if the current piece collides with other pieces on the playfield.
-
-    Args:
-        piece (list): The current piece.
-
-    Returns:
-        bool: True if collision occurs, False otherwise.
-    
-    for block in TETRIS_SHAPES[piece[2]]:
-        abs_x = piece[0] + block[0]
-        abs_y = piece[1] + block[1]
-        if abs_x < 0 or abs_x >= GRID_WIDTH or abs_y >= GRID_HEIGHT or (abs_y >= 0 and playfield_canvas.find_enclosed(abs_x * CELL_SIZE, abs_y * CELL_SIZE, (abs_x + 1) * CELL_SIZE, (abs_y + 1) * CELL_SIZE)):
-            return True
-    return False"""
-
-
 def piece_hits_bottom(piece):
     """
     This function checks if the current piece hits the bottom of the playfield.
@@ -257,6 +275,7 @@ def piece_hits_bottom(piece):
         if abs_y >= GRID_HEIGHT:
             return True
     return False
+
 
 def generate_piece():
     """
@@ -286,14 +305,16 @@ def move_piece_down():
     move_piece("down")
 
     # Check if the piece has reached the bottom
-    if not piece_hits_bottom(actual_piece):
+    if not piece_hits_bottom(actual_piece) and not piece_colision(actual_piece, "down"):
         # Schedule the next movement down after a delay
         app.after(10, move_piece_down)
+
 
 def start_new_piece():
     global actual_piece
     actual_piece = generate_piece()
     draw_tetris_piece(actual_piece[0], actual_piece[1], actual_piece[2])
+
 
 def game_loop():
     create_tetris_playfield()
@@ -306,7 +327,8 @@ def game_loop():
             start_new_piece()
         app.update()
         t.sleep(0.5)
-        
+
+
 def start_game_loop_in_thread():
     """
     This function starts the game loop in a separate thread.
