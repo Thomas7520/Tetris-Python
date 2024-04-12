@@ -8,7 +8,7 @@ from pathlib import Path
 global root_path, image_path, database_path, database_name, login_path
 root_path = Path(__file__).resolve().parent.parent
 image_path = root_path / "images"
-login_path = root_path / "src/login"
+login_path = root_path / "src" / "login"
 
 database_path = root_path / "database"
 database_name = "database.csv"

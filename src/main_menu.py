@@ -1,4 +1,4 @@
-import sys, argparse
+import argparse
 
 def run():
     pass

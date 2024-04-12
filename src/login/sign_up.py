@@ -5,8 +5,8 @@ import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import utils
 
-sign_in_script = os.path.join(utils.login_path, "sign_in.py")
-main_menu_script = os.path.join(utils.root_path, "src\\main_menu.py")
+sign_in_script = utils.login_path / "sign_in.py"
+main_menu_script = utils.root_path / "src" / "main_menu.py"
 
     
 def label_new_account_hover_on(event):
