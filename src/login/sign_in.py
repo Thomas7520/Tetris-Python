@@ -15,6 +15,16 @@ def label_new_account_hover_off(event):
     label_create_account.configure(text_color="#9A9A9A")
     app.config(cursor="")
 
+def state_password_view(event):
+    password_entry.view_password = not password_entry.view_password
+    
+    if password_entry.view_password:
+        password_entry.configure(show="")
+        image_password_label.configure(image=password_entry.image_show)
+    else:
+        password_entry.configure(show="*")
+        image_password_label.configure(image=password_entry.image)
+
 def open_new_account_window(event):
     app.destroy()
     utils.exec_python(sign_up_script)
@@ -95,7 +105,7 @@ def run():
 
     frame_components.grid(row=1, column=0, sticky="nsew", pady=10)
 
-    global username_entry, email_entry, password_entry
+    global username_entry, email_entry, password_entry, image_password_label
     
     username_entry = customtkinter.CTkEntry(master=frame_components, placeholder_text="Pseudo", height=70 ,fg_color="#D9D9D9", corner_radius=0, border_color="#D9D9D9", bg_color="#D9D9D9",text_color="#9A9A9A", font=("", 20))
     username_entry.image = utils.get_image("user_icon.png", 64, 64)
@@ -114,10 +124,14 @@ def run():
 
 
     password_entry = customtkinter.CTkEntry(master=frame_components, placeholder_text="Mot de passe", height=70 ,fg_color="#D9D9D9", corner_radius=0, border_color="#D9D9D9", bg_color="#D9D9D9",text_color="#9A9A9A", show='*', font=("", 20))
+    password_entry.view_password = False
     password_entry.image = utils.get_image("password_icon.png", 64, 64)
+    password_entry.image_show = utils.get_image("password_icon_show.png", 64, 64)
     password_entry.grid(row=2, column=0, sticky="sew", padx=(25,0), pady=5)
     password_entry.bind("<Return>", perform_register)
+   
     image_password_label = customtkinter.CTkLabel(frame_components, text="", height=70, image=password_entry.image, fg_color="#D9D9D9", bg_color="#D9D9D9")
+    image_password_label.bind("<Button-1>", state_password_view)
     image_password_label.grid(row=2, column=1, sticky="se", padx=(0,25), pady=5)
 
     global frame_components_bottom
