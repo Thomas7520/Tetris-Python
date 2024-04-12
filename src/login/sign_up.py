@@ -17,21 +17,37 @@ def label_new_account_hover_off(event):
     label_create_account.configure(text_color="#9A9A9A")
     app.config(cursor="")
 
-def open_new_account_window(event):
-    app.destroy()
-    utils.exec_python(sign_in_script)
+def label_password_hover_on(event):
+    if password_entry.view_password:
+        image_password_label.configure(image=password_entry.image_show_hover)
+    else:
+        image_password_label.configure(image=password_entry.image_hover)
+    
+    app.config(cursor="hand2")
+    
+def label_password_hover_off(event):
+    if password_entry.view_password:
+        image_password_label.configure(image=password_entry.image_show)
+    else:
+        image_password_label.configure(image=password_entry.image)
+    
+    app.config(cursor="")
     
 def state_password_view(event):
     password_entry.view_password = not password_entry.view_password
     
     if password_entry.view_password:
         password_entry.configure(show="")
-        image_password_label.configure(image=password_entry.image_show)
+        image_password_label.configure(image=password_entry.image_show_hover)
     else:
         password_entry.configure(show="*")
-        image_password_label.configure(image=password_entry.image)
+        image_password_label.configure(image=password_entry.image_hover)
         
 
+def open_new_account_window(event):
+    app.destroy()
+    utils.exec_python(sign_in_script)
+    
 def perform_login(event=None):
     if not username_entry.get():
         CTkMessagebox.CTkMessagebox(title="Erreur", message="Veuillez saisir un pseudo", icon="warning")
@@ -113,12 +129,16 @@ def run():
     password_entry = customtkinter.CTkEntry(master=frame_components, placeholder_text="Mot de passe", height=70 ,fg_color="#D9D9D9", corner_radius=0, border_color="#D9D9D9", bg_color="#D9D9D9",text_color="#9A9A9A", show='*', font=("", 20))
     password_entry.view_password = False
     password_entry.image = utils.get_image("password_icon.png", 64, 64)
+    password_entry.image_hover = utils.get_image("password_icon_hover.png", 64, 64)
     password_entry.image_show = utils.get_image("password_icon_show.png", 64, 64)
+    password_entry.image_show_hover = utils.get_image("password_icon_show_hover.png", 64, 64)
     password_entry.grid(row=1, column=0, sticky="sew", padx=(25,0), pady=5)
     password_entry.bind("<Return>", perform_login)
     
     image_password_label = customtkinter.CTkLabel(frame_components, text="", height=70, image=password_entry.image, fg_color="#D9D9D9", bg_color="#D9D9D9")
     image_password_label.bind("<Button-1>", state_password_view)
+    image_password_label.bind("<Enter>", label_password_hover_on)
+    image_password_label.bind("<Leave>", label_password_hover_off)
     image_password_label.grid(row=1, column=1, sticky="se", padx=(0,25), pady=5)
 
 
