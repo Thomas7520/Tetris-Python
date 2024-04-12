@@ -7,7 +7,7 @@ First, before launching the program you have to install some librarys :
     pip install pillow
     pip install threading
 
-You have to set the python in your environnements variables (name: python) 
+You have to set the python in your environnements variables (name: python or python3) 
 
 
 The score received by each line clear is dependent on the level. Each type of clear, being a single, double, triple, or Tetris, has a base value which is multiplied by the number 1 higher than the current level. For any level 
