@@ -233,7 +233,8 @@ def run():
     button_perform = customtkinter.CTkButton(master=frame_components_bottom,text="Se connecter", corner_radius=0, height=65, bg_color="#67E9DA", fg_color="#67E9DA", hover_color="#436e77", font=("Arial Bold", 20), text_color="white", width=200, cursor="hand2", command=perform_button)
     button_perform.grid(row=0, column=1, sticky="e", padx=25, pady=(0,10))
 
-    app.minsize(app.winfo_width(), app.winfo_height())
+    
+    app.minsize(app.winfo_reqwidth(), app.winfo_reqheight())
     app.mainloop()
     
 if __name__ == "__main__":
