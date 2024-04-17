@@ -4,7 +4,9 @@ import sys
 import utils
 import main_menu
 
-
+if sys.platform == "win32":
+    import ctypes
+    ctypes.windll.shcore.SetProcessDpiAwareness(1)
 
 
 is_login_window = True
@@ -135,8 +137,6 @@ def run():
         logo_image = 'tetris_icon.icns'
 
     elif platform_name == 'win32':
-        from ctypes import windll
-        windll.shcore.SetProcessDpiAwareness(1)
         logo_image = 'tetris_icon.ico'
 
     else:
