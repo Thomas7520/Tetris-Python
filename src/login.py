@@ -4,15 +4,13 @@ import sys
 import utils
 import main_menu
 
+# Allows to remove the strange blur effect
 if sys.platform == "win32":
     import ctypes
     ctypes.windll.shcore.SetProcessDpiAwareness(1)
 
 
 is_login_window = True
-
-#sign_up_script = utils.login_path / "sign_up.py"
-main_menu_script = utils.root_path / "src" / "main_menu.py"
 
 def switch_window(event=None):
     global is_login_window
@@ -245,6 +243,8 @@ def run():
 
     
     app.minsize(app.winfo_reqwidth(), app.winfo_reqheight())
+    
+    main_menu.run(app, "Thomas")
     app.mainloop()
     
 if __name__ == "__main__":
