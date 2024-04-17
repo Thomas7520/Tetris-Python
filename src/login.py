@@ -1,15 +1,29 @@
 import customtkinter
 import CTkMessagebox
-import os, sys
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import sys
 import utils
+import main_menu
 
 is_login_window = True
 
 #sign_up_script = utils.login_path / "sign_up.py"
 main_menu_script = utils.root_path / "src" / "main_menu.py"
+
+def switch_window(event=None):
+    global is_login_window
+
+    if is_login_window:
+        register_window()
+    else:
+        login_window()
     
+    is_login_window = not is_login_window
+    
+    if password_entry.view_password:
+        password_entry.view_password = False
+        password_entry.configure(show="*")
+        image_password_label.configure(image=password_entry.image)
+        
 def label_switch_window_hover_on(event):
     label_switch_window.configure(text_color="#2e2e2e")
     app.config(cursor="hand2")
@@ -34,7 +48,7 @@ def label_password_hover_off(event):
     
     app.config(cursor="")
     
-def state_password_view(event):
+def state_password_view(event=None):
     password_entry.view_password = not password_entry.view_password
     
     if password_entry.view_password:
@@ -59,8 +73,8 @@ def perform_login():
         CTkMessagebox.CTkMessagebox(title="Erreur", message="Le nom d'utilisateur ou le mot de passe est incorrect", icon="warning")
     else:
         CTkMessagebox.CTkMessagebox(title="Login", message="Connexion avec succès !", icon="check").get()
-        utils.exec_python(main_menu_script, [username_entry.get()])
-        app.destroy()
+        
+        main_menu.run(app, username_entry.get())
         
 def perform_register():
     if not username_entry.get():
@@ -80,15 +94,7 @@ def perform_register():
         switch_window()
         
 
-def switch_window(event=None):
-    global is_login_window
 
-    if is_login_window:
-        register_window()
-    else:
-        login_window()
-    
-    is_login_window = not is_login_window
     
 def login_window():
     if not username_entry._placeholder_text_active: username_entry.delete(0, 'end')
@@ -121,7 +127,7 @@ def run():
     app.config(background='#96B5BA')
     
     platform_name = sys.platform
-    if platform_name == 'Darwin':
+    if platform_name == 'darwin':
 
         logo_image = 'tetris_icon.icns'
 

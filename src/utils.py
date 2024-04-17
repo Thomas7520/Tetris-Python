@@ -1,7 +1,8 @@
-import os, re, csv
+import re, csv
 import subprocess
 import bcrypt
-from PIL import Image, ImageTk
+from customtkinter import CTkImage
+from PIL import Image
 
 from pathlib import Path
 
@@ -52,7 +53,7 @@ def round_rectangle(canvas, x1, y1, x2, y2, radius=25, **kwargs):
     return canvas.create_polygon(points, **kwargs, smooth=True)
 
 
-def get_image(name: str, width: int, height: int) -> ImageTk.PhotoImage:
+def get_image(name: str, width: int, height: int) -> CTkImage:
     """
     Opens an image from the images folder and resizes it to the specified dimensions.
 
@@ -62,11 +63,13 @@ def get_image(name: str, width: int, height: int) -> ImageTk.PhotoImage:
         height (int): The desired height of the image.
 
     Returns:
-        ImageTk.PhotoImage: The resized image.
+        CTkImage: The resized image.
 
     """
-    return ImageTk.PhotoImage(Image.open(image_path / name).resize((width, height)))
     
+    return CTkImage(light_image=Image.open(image_path / name),
+                                  dark_image=Image.open(image_path / name),
+                                  size=(width * 0.8, height * 0.8))    
 
 def exec_python(path_script: str, args=[]) -> None:
     try:
