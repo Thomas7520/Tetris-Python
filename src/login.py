@@ -1,8 +1,11 @@
-import customtkinter
-import CTkMessagebox
+import tkinter, customtkinter
+import tkinter.messagebox
 import sys
 import utils
 import main_menu
+
+
+
 
 is_login_window = True
 
@@ -66,30 +69,30 @@ def perform_button(event=None):
         
 def perform_login():
     if not username_entry.get():
-        CTkMessagebox.CTkMessagebox(title="Erreur", message="Veuillez saisir un pseudo", icon="warning")
+        tkinter.messagebox.showwarning(title="Erreur", message="Veuillez saisir un pseudo !")
     elif not password_entry.get():
-        CTkMessagebox.CTkMessagebox(title="Erreur", message="Veuillez saisir un mot de passe", icon="warning")
+        tkinter.messagebox.showwarning(title="Erreur", message="Veuillez saisir un mot de passe !")
     elif not utils.username_exist(username_entry.get()) or not utils.check_password(username_entry.get(), password_entry.get()):
-        CTkMessagebox.CTkMessagebox(title="Erreur", message="Le nom d'utilisateur ou le mot de passe est incorrect", icon="warning")
+        tkinter.messagebox.showwarning(title="Erreur", message="Le nom d'utilisateur ou le mot de passe est incorrect !")
     else:
-        CTkMessagebox.CTkMessagebox(title="Login", message="Connexion avec succès !", icon="check").get()
         
+        tkinter.messagebox.showinfo(title="Login", message="Connexion avec succès !")
         main_menu.run(app, username_entry.get())
         
 def perform_register():
     if not username_entry.get():
-        CTkMessagebox.CTkMessagebox(title="Erreur", message="Veuillez saisir un pseudo !", icon="warning")
+        tkinter.messagebox.showwarning(title="Erreur", message="Veuillez saisir un pseudo !")
     elif not password_entry.get():
-        CTkMessagebox.CTkMessagebox(title="Erreur", message="Veuillez saisir un mot de passe !", icon="warning")
+        tkinter.messagebox.showwarning(title="Erreur", message="Veuillez saisir un mot de passe !")
     elif not email_entry.get():
-        CTkMessagebox.CTkMessagebox(title="Erreur", message="Veuillez saisir un email !", icon="warning")
+        tkinter.messagebox.showwarning(title="Erreur", message="Veuillez saisir un email !")
     elif not utils.is_valid_email(email_entry.get()):
-        CTkMessagebox.CTkMessagebox(title="Erreur", message="Veuillez saisir un email valide !", icon="warning") 
+        tkinter.messagebox.showwarning(title="Erreur", message="Veuillez saisir un email valide !")
     elif utils.username_exist(username_entry.get()) or utils.email_exist(email_entry.get()):
-        CTkMessagebox.CTkMessagebox(title="Erreur", message="Le compte existe déjà", icon="warning")
+        tkinter.messagebox.showwarning(title="Erreur", message="Le compte existe déjà !")
     else:
         utils.write_csv([username_entry.get(), email_entry.get(), password_entry.get()])
-        CTkMessagebox.CTkMessagebox(title="Login", message="Le compte a été crée avec succès", icon="check").get() #Le get permet de mettre en pause le programme jusqu'à ce que la fenêtre soit fermée
+        tkinter.messagebox.showwarning(title="Erreur", message="Le compte a été crée avec succès !")
 
         switch_window()
         
@@ -122,7 +125,7 @@ def register_window():
 def run():
     global app, is_login_window
 
-    app = customtkinter.CTk()
+    app = tkinter.Tk()
     app.title("Login")
     app.config(background='#96B5BA')
     
@@ -132,7 +135,8 @@ def run():
         logo_image = 'tetris_icon.icns'
 
     elif platform_name == 'win32':
-
+        from ctypes import windll
+        windll.shcore.SetProcessDpiAwareness(1)
         logo_image = 'tetris_icon.ico'
 
     else:

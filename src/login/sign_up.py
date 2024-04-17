@@ -1,4 +1,4 @@
-import customtkinter
+import tkinter, customtkinter
 import CTkMessagebox
 import os, sys
 
@@ -63,7 +63,7 @@ def perform_login(event=None):
 def run():
     global app 
 
-    app = customtkinter.CTk()
+    app = tkinter.Tk()
     app.title("Login")
     app.config(background='#96B5BA')
     app.iconbitmap(utils.image_path / "tetris_icon.ico")
