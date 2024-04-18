@@ -1,5 +1,5 @@
 import tkinter as tk
-import random
+import random as rd
 import threading as th
 
 width = 10
@@ -62,8 +62,8 @@ playfield_canvas.pack(expand=1)
 
 def new_piece():
     global actual_piece
-    shape = random.choice(tetrominos)
-    color = random.choice(list(colors.values()))
+    shape = rd.choice(tetrominos)
+    color = rd.choice(list(colors.values()))
     actual_piece = {
         "forme": shape,
         "couleur": color,
