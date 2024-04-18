@@ -1,420 +1,204 @@
 import tkinter as tk
-import random as rd
+import random
 import threading as th
-import time as t
 
+width = 10
+height = 20
+cell_size = 32
 
-# Grid size parameters
-GRID_WIDTH = 10
-GRID_HEIGHT = 24
-CELL_SIZE = 30
-
-# Colors parameters
-BACKGROUND_COLOR = "black"
-GRID_COLOR = "gray"
-BLOCK_COLORS = ["#0077D3", "#53DA3F", "#FD3F59",
-                "#FF910C", "#FE4819", "#78256F", "#485DC5"]
-
-# Template of the tetris blocks for each shape
-TETRIS_SHAPES = [
-    # L piece
-    [(0, 0), (0, 1), (0, 2), (1, 2)],
-    # Square piece
-    [(0, 0), (1, 0), (0, 1), (1, 1)],
-    # T piece
-    [(0, 0), (1, 0), (2, 0), (1, 1)],
-    # Z piece
-    [(0, 0), (1, 0), (1, 1), (2, 1)],
-    # S piece
-    [(1, 0), (2, 0), (0, 1), (1, 1)],
-    # J piece
-    [(0, 0), (0, 1), (0, 2), (1, 0)],
-    # I piece
-    [(0, 0), (0, 1), (0, 2), (0, 3)]
-]
-
-# Créer un dictionnaire pour stocker le nombre de fois que chaque pièce est sortie
-piece_counts = {i: 0 for i in range(len(TETRIS_SHAPES))}
-
-# Définir les pourcentages pour chaque pièce (vous pouvez ajuster ces valeurs selon vos préférences)
-piece_percentages = {
-    0: 10,   # L piece
-    1: 15,   # Square piece
-    2: 10,   # T piece
-    3: 15,   # Z piece
-    4: 15,   # S piece
-    5: 10,   # J piece
-    6: 25    # I piece
+colors = {
+    0: "#000000",
+    1: "#FF0000",
+    2: "#00FF00",
+    3: "#0000FF",
+    4: "#FFA500",
+    5: "#FFFF00",
+    6: "#800080",
+    7: "#00FFFF"
 }
 
-def create_tetris_playfield():
-    """
-    This function creates the tetris playfield on the screen.
+tetrominos = [
+    [[0, 0, 1],
+     [1, 1, 1]],
 
-    Args:
-        None
+    [[0, 2, 2],
+     [2, 2, 0]],
 
-    Returns:
-        None
-    """
-    global playfield_canvas
+    [[0, 3, 0],
+     [3, 3, 3]],
 
-    # Create the canvas to display the playfield and place it on the center of the screen
-    playfield_canvas = tk.Canvas(
-        app, width=GRID_WIDTH * CELL_SIZE, height=GRID_HEIGHT * CELL_SIZE, bg=BACKGROUND_COLOR)
-    playfield_canvas.place(relx=0.5, rely=0.5, anchor="center")
+    [[4, 4, 0],
+     [0, 4, 4]],
 
-    # Create rectangles to represent the last three pieces generated
-    piece_rectangles = []
-    for i in range(3):
-        rectangle = playfield_canvas.create_rectangle(
-            GRID_WIDTH * CELL_SIZE + 20, i * CELL_SIZE * 4 + 20, GRID_WIDTH * CELL_SIZE + 60, i * CELL_SIZE * 4 + 60, outline="black", width=2)
-        piece_rectangles.append(rectangle)
+    [[0, 5, 5],
+     [5, 5, 0]],
 
-    # Draw the grid
-    for y in range(GRID_HEIGHT):
-        for x in range(GRID_WIDTH):
-            x0, y0 = x * CELL_SIZE, y * CELL_SIZE
-            x1, y1 = x0 + CELL_SIZE, y0 + CELL_SIZE
+    [[6, 0, 0],
+     [6, 6, 6]],
+
+    [[7],
+     [7],
+     [7],
+     [7],
+     ]
+]
+
+
+playfield = [[0] * width for _ in range(height)]
+
+
+actual_piece = None
+
+
+app = tk.Tk()
+app.title("Tetris")
+app.attributes("-fullscreen", True)
+
+
+playfield_canvas = tk.Canvas(
+    app, width=width * cell_size, height=height * cell_size, bg="black")
+playfield_canvas.pack(expand=1)
+
+
+def new_piece():
+    global actual_piece
+    shape = random.choice(tetrominos)
+    color = random.choice(list(colors.values()))
+    actual_piece = {
+        "forme": shape,
+        "couleur": color,
+        "x": width // 2 - len(shape[0]) // 2,
+        "y": 0
+    }
+
+
+def refresh_playfield():
+    playfield_canvas.delete("piece")
+    for y in range(height):
+        for x in range(width):
+            color = colors[playfield[y][x]]
             playfield_canvas.create_rectangle(
-                x0, y0, x1, y1, outline=GRID_COLOR)
-            
-            
+                x * cell_size, y * cell_size, (x + 1) * cell_size, (y + 1) * cell_size, fill=color, tags="piece")
+
+    if actual_piece is not None:
+        for y, ligne in enumerate(actual_piece["forme"]):
+            for x, case in enumerate(ligne):
+                if case != 0:
+                    couleur = actual_piece["couleur"]
+                    playfield_canvas.create_rectangle((actual_piece["x"] + x) * cell_size, (actual_piece["y"] + y) * cell_size,
+                                                      (actual_piece["x"] + x + 1) * cell_size, (
+                                                          actual_piece["y"] + y + 1) * cell_size,
+                                                      fill=couleur, tags="piece")
+
+# Fonction pour déplacer la pièce actuelle vers la gauche
 
 
-def draw_block(x, y, color):
-    """
-    This function draws a block on the tetris playfield.
+def move_left(event):
+    if actual_piece is not None:
+        if actual_piece["x"] > 0 and not collision(-1):
+            actual_piece["x"] -= 1
+            refresh_playfield()
 
-    Args:
-        x (int): The x position of the block
-        y (int): The y position of the block
-        color (str): The color of the block
-
-    Returns:
-        None
-    """
-    x0, y0 = x * CELL_SIZE, y * CELL_SIZE
-    x1, y1 = x0 + CELL_SIZE, y0 + CELL_SIZE
-    playfield_canvas.create_rectangle(
-        x0, y0, x1, y1, fill=color, outline="black", tag="maPiece")
+# Fonction pour déplacer la pièce actuelle vers la droite
 
 
-def draw_tetris_piece(x, y, shape_index, state=True):
-    """
-    This function draws a tetris piece on the playfield.
+def move_right(event):
+    if actual_piece is not None:
+        if actual_piece["x"] < width - len(actual_piece["forme"][0]) and not collision(1):
+            actual_piece["x"] += 1
+            refresh_playfield()
 
-    Args:
-        x (int): The x position of the piece
-        y (int): The y position of the piece
-        shape_index (int): The index of the shape in the TETRIS_SHAPES list
-        state (bool): True to draw the piece, False to delete it
 
-    Returns:
-        None
-    """
-    if state:
-        color = BLOCK_COLORS[shape_index % len(BLOCK_COLORS)]
-        shape = TETRIS_SHAPES[shape_index]
-        for block in shape:
-            draw_block(x + block[0], y + block[1], color)
+def move_down_touch(event):
+    if actual_piece is not None:
+        if actual_piece["y"] < height - len(actual_piece["forme"]) and not collision(0, 1):
+            actual_piece["y"] += 1
+            refresh_playfield()
+
+
+def move_down(event=None):
+    global actual_piece
+    if actual_piece is not None:
+        if actual_piece["y"] < height - len(actual_piece["forme"]) and not collision(0, 1):
+            actual_piece["y"] += 1
+            refresh_playfield()
+            app.after(1000, move_down)
+        else:
+            piece_fix()
+            new_piece()
+            refresh_playfield()
+            app.after(1000, move_down)
     else:
-        for block in TETRIS_SHAPES[shape_index]:
-            draw_block(x + block[0], y + block[1], BACKGROUND_COLOR)
+        new_piece()
+        refresh_playfield()
+        app.after(1000, move_down)
 
 
-def draw_block_definitly(x, y, color):
-    """
-    This function draws a block on the tetris playfield.
-
-    Args:
-        x (int): The x position of the block
-        y (int): The y position of the block
-        color (str): The color of the block
-
-    Returns:
-        None
-    """
-    x0, y0 = x * CELL_SIZE, y * CELL_SIZE
-    x1, y1 = x0 + CELL_SIZE, y0 + CELL_SIZE
-    playfield_canvas.create_rectangle(
-        x0, y0, x1, y1, fill=color, outline="black")
+def piece_rotation(event=None):
+    if actual_piece is not None:
+        ancienne_forme = actual_piece["forme"]
+        actual_piece["forme"] = [[ancienne_forme[j][i] for j in range(
+            len(ancienne_forme))] for i in range(len(ancienne_forme[0]))]
+        if collision():
+            actual_piece["forme"] = ancienne_forme
+        refresh_playfield()
 
 
-def draw_tetris_pieces_definitly(x, y, shape_index):
-    """
-    This function draws a tetris piece on the playfield.
-
-    Args:
-        x (int): The x position of the piece
-        y (int): The y position of the piece
-        shape_index (int): The index of the shape in the TETRIS_SHAPES list
-        state (bool): True to draw the piece, False to delete it
-
-    Returns:
-        None
-    """
-    color = BLOCK_COLORS[shape_index % len(BLOCK_COLORS)]
-    shape = TETRIS_SHAPES[shape_index]
-    for block in shape:
-        draw_block_definitly(x + block[0], y + block[1], color)
-
-
-locked_blocks = []
-
-
-def lock_piece():
+def collision(dx=0, dy=0):
     global actual_piece
-
-    secondary_list = []
-    for block in TETRIS_SHAPES[actual_piece[2]]:
-        abs_x = actual_piece[0] + block[0]
-        abs_y = actual_piece[1] + block[1]
-        secondary_list.append((abs_x, abs_y))
-    locked_blocks.append(secondary_list)
-
-    draw_tetris_pieces_definitly(
-        actual_piece[0], actual_piece[1]-1, actual_piece[2])
-    actual_piece = generate_piece()
-    draw_tetris_piece(actual_piece[0], actual_piece[1], actual_piece[2])
-    print(locked_blocks)
-
-
-def piece_colision(piece, direction):
-    """
-    Cette fonction vérifie si la pièce actuelle entre en collision avec d'autres pièces verrouillées sur le plateau de jeu.
-
-    Args:
-        piece (list): La pièce actuelle.
-        direction (str): La direction du mouvement ("left", "right", ou "down").
-
-    Returns:
-        bool: True si une collision est détectée, False sinon.
-    """
-    for block in TETRIS_SHAPES[piece[2]]:
-        abs_x = piece[0] + block[0]
-        abs_y = piece[1] + block[1]
-
-        # Vérifier si la pièce entre en collision avec une pièce verrouillée
-        for locked_piece in locked_blocks:
-            if direction == "down":
-                if (abs_x, abs_y + 1) in locked_piece:
+    for y, ligne in enumerate(actual_piece["forme"]):
+        for x, case in enumerate(ligne):
+            if case != 0:
+                new_x, new_y = actual_piece["x"] + \
+                    x + dx, actual_piece["y"] + y + dy
+                if not (0 <= new_x < width and 0 <= new_y < height) or playfield[new_y][new_x] != 0:
                     return True
-            elif direction == "left":
-                if (abs_x - 1, abs_y+1) in locked_piece:
-                    return True
-            elif direction == "right":
-                if (abs_x + 1, abs_y+1) in locked_piece:
-                    return True
-
     return False
 
 
-def piece_hits_side(piece, direction):
-    """
-    Cette fonction vérifie si la pièce atteint le côté gauche ou droit du terrain de jeu.
+def clear_lines():
+    global playfield
+    complete_lines = []
+    for y in range(height):
+        if all(playfield[y]):
+            complete_lines.append(y)
 
-    Args:
-        piece (list): La pièce actuelle.
-        direction (str): La direction à vérifier ("left" ou "right").
+    for y in complete_lines:
+        playfield.pop(y)
+        playfield.insert(0, [0] * width)
 
-    Returns:
-        bool: True si la pièce atteint le côté, False sinon.
-    """
-    for block in TETRIS_SHAPES[piece[2]]:
-        abs_x = piece[0] + block[0]
-        if direction == "left" and abs_x <= 0:
-            return True
-        elif direction == "right" and abs_x >= GRID_WIDTH - 1:
-            return True
-    return False
+    refresh_playfield()
 
 
-def move_piece(direction):
+def piece_fix():
     global actual_piece
-
-    if direction == "left":
-        if not piece_hits_side(actual_piece, "left") and not piece_colision(actual_piece, "left"):
-            actual_piece[0] -= 1
-    elif direction == "right":
-        if not piece_hits_side(actual_piece, "right") and not piece_colision(actual_piece, "right"):
-            actual_piece[0] += 1
-    elif direction == "down":
-        if not piece_hits_bottom(actual_piece) and not piece_colision(actual_piece, "down"):
-            actual_piece[1] += 1
-
-    if piece_hits_bottom(actual_piece) or piece_colision(actual_piece, "down"):
-        lock_piece()
-
-    del_piece(actual_piece)
-    draw_tetris_piece(actual_piece[0], actual_piece[1], actual_piece[2])
-
-
-def key_press(event):
-    """
-    This function handles the key press events.
-
-    Args:
-        event (tk.Event): The event object containing information about the key press.
-
-    Returns:
-        None
-    """
-    key = event.keysym
-    if key == "Left":
-        move_piece("left")
-    elif key == "Right":
-        move_piece("right")
-    elif key == "Down":
-        move_piece("down")
-
-
-def del_piece(piece):
-    """
-    This function deletes a tetris piece from the playfield.
-
-    Args:
-        piece (list): The piece to be deleted.
-
-    Returns:
-        None
-    """
-    playfield_canvas.delete("maPiece")
-
-
-def piece_hits_bottom(piece):
-    """
-    This function checks if the current piece hits the bottom of the playfield.
-
-    Args:
-        piece (list): The current piece.
-
-    Returns:
-        bool: True if the piece hits the bottom, False otherwise.
-    """
-    for block in TETRIS_SHAPES[piece[2]]:
-        abs_y = piece[1] + block[1]
-        if abs_y >= GRID_HEIGHT:
-            return True
-    return False
-
-
-# Créer une liste pour stocker les trois dernières pièces générées
-last_three_pieces = []
-
-def generate_piece():
-    global last_three_pieces
-
-    """
-    This function generates a new tetris piece.
-
-    Args:
-        None
-
-    Returns:
-        list: The newly generated piece.
-    """
-    # Calculer les pourcentages cumulés pour choisir une pièce en fonction des pourcentages
-    cumulative_percentages = [0] * len(TETRIS_SHAPES)
-    total_percentages = 0
-    for index, percentage in piece_percentages.items():
-        total_percentages += percentage
-        cumulative_percentages[index] = total_percentages
-
-    # Choisir un nombre aléatoire dans l'intervalle total des pourcentages
-    random_number = rd.randint(1, total_percentages)
-
-    # Trouver la pièce correspondant au nombre aléatoire
-    chosen_piece = 0
-    for index, cumulative_percentage in enumerate(cumulative_percentages):
-        if random_number <= cumulative_percentage:
-            chosen_piece = index
-            break
-
-    # Mettre à jour le nombre de fois que la pièce a été sortie
-    piece_counts[chosen_piece] += 1
-
-    # Stocker la pièce dans la liste FIFO
-    last_three_pieces.append(chosen_piece)
-    if len(last_three_pieces) > 3:
-        last_three_pieces.pop(0)
-
-    return [GRID_WIDTH // 2, 0, chosen_piece]
-
-
-
-def move_piece_down():
-    """
-    Move the current piece down one step.
-
-    Args:
-        None
-
-    Returns:
-        None
-    """
-    global actual_piece
-
-    move_piece("down")
-
-    # Check if the piece has reached the bottom
-    if not piece_hits_bottom(actual_piece) and not piece_colision(actual_piece, "down"):
-        # Schedule the next movement down after a delay
-        app.after(10, move_piece_down)
-
-
-def start_new_piece():
-    global actual_piece
-    actual_piece = generate_piece()
-    draw_tetris_piece(actual_piece[0], actual_piece[1], actual_piece[2])
+    for y, line in enumerate(actual_piece["forme"]):
+        for x, case in enumerate(line):
+            if case != 0:
+                playfield[actual_piece["y"] + y][actual_piece["x"] +
+                                                 x] = list(colors.values()).index(actual_piece["couleur"])
+    clear_lines()
 
 
 def game_loop():
-    create_tetris_playfield()
-    start_new_piece()
-
-    while True:
-        move_piece("down")
-        if piece_hits_bottom(actual_piece):
-            lock_piece()
-            start_new_piece()
-        app.update()
-        t.sleep(0.5)
+    new_piece()
+    refresh_playfield()
+    app.after(500, move_down)
 
 
-def start_game_loop_in_thread():
-    """
-    This function starts the game loop in a separate thread.
-
-    Args:
-        None
-
-    Returns:
-        None
-    """
+def threading_game_loop():
     game_thread = th.Thread(target=game_loop)
     game_thread.daemon = True
     game_thread.start()
 
 
 def main():
-    """
-    This function initializes the game.
+    app.bind("<Left>", move_left)
+    app.bind("<Right>", move_right)
+    app.bind("<Down>", move_down_touch)
+    app.bind("<Up>", piece_rotation)
 
-    Args:
-        None
-
-    Returns:
-        None
-    """
-    global app, actual_piece
-
-    app = tk.Tk()
-    app.attributes("-fullscreen", True)
-
-    app.bind("<KeyPress>", key_press)
-    start_game_loop_in_thread()
-
+    threading_game_loop()
     app.mainloop()
 
 
