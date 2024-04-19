@@ -40,7 +40,7 @@ def key_pressed_event(event):
     global button_bind_selected 
     
     key_code = event.keycode
-    key_name = event.keysym
+    key_name = str(event.keysym).capitalize()
         
     if button_bind_selected is not None:
         
@@ -49,7 +49,6 @@ def key_pressed_event(event):
             button_bind_selected = None
             return
         
-        # TODO: update key in csv user 
         bind_options[button_bind_selected.bind_id][1] = (key_code, key_name)
         utils.update_bind_options(name, bind_options)
         button_bind_selected.configure(text=key_name, text_color="black")
@@ -67,10 +66,8 @@ def run(application : tkinter.Tk, username : str):
     # Reset grids to default values and remove widgets from grids
     utils.reset_grids(app)
             
-    #app.attributes("-fullscreen", True)
+    app.attributes("-fullscreen", True)
 
-    
-    
     app.grid_columnconfigure(0, weight=1)
     app.grid_rowconfigure(0, weight=1)
 
@@ -112,16 +109,12 @@ def run(application : tkinter.Tk, username : str):
     button_quit = customtkinter.CTkButton(master=frame_main_menu, text="Quitter", corner_radius=0, height=65, fg_color="#67E9DA", hover_color="#436e77", font=("Arial Bold", 20), text_color="white", width=width_button, cursor="hand2", command=lambda: app.quit())
     button_quit.grid(row=3, column=0, sticky="EW", pady=(5,10), padx=padx_button)
     
-    
-    
     # leaderboard menu
     
     frame_leaderboard = customtkinter.CTkFrame(master=image_canvas,  corner_radius=0, fg_color="#96B5BA", bg_color="#96B5BA")
     frame_leaderboard.grid_rowconfigure(0, weight=1)
     frame_leaderboard.grid_rowconfigure(1, weight=1)
     frame_leaderboard.grid_rowconfigure(2, weight=1)
-
-
 
     label_leaderboard = customtkinter.CTkLabel(master=frame_leaderboard, width=300, corner_radius=0, fg_color="#96B5BA", bg_color="#96B5BA", text="Leaderboard", font=(0,30), text_color="White")
     label_leaderboard.grid(row=0, column=0, sticky= "S", pady=10)
@@ -130,9 +123,10 @@ def run(application : tkinter.Tk, username : str):
     scrollable_frame.grid_columnconfigure(1,weight=1)
     scrollable_frame.grid(row=1, column=0, pady=10)
     
-    
     # Create a list to store the leaderboard data
     leaderboard_data = [("Player1", 6546546), ("Player2", 846510), ("Player3", 8456654), ("Player3", 566456), ("Player3", 654564), ("Player3", 80), ("Player3", 80), ("Player3", 80), ("Player3", 80), ("Player3", 80), ("Player3", 80)]
+    
+    #leaderboard_data = utils.get_highscore_list()
     
     for i in range(len(leaderboard_data)):
         username_label = customtkinter.CTkLabel(master=scrollable_frame, corner_radius=0, text=leaderboard_data[i][0], text_color="White", font=(0, 14))
@@ -150,25 +144,18 @@ def run(application : tkinter.Tk, username : str):
     frame_options.grid_rowconfigure(1, weight=1)
     frame_options.grid_rowconfigure(2, weight=1)
 
-
-
     label_options = customtkinter.CTkLabel(master=frame_options, width=300, corner_radius=0, fg_color="#96B5BA", bg_color="#96B5BA", text="Options", font=(0,30), text_color="White")
     label_options.grid(row=0, column=0, sticky= "S", pady=10)
 
     scrollable_options = customtkinter.CTkScrollableFrame(width=250, master=frame_options)
     scrollable_options.grid(row=1, column=0, pady=10)
-    
-    
-    # Create a list to store the leaderboard data
-    options_data = []
-    
+      
     label_slider = customtkinter.CTkLabel(master=scrollable_options, corner_radius=0, text="Volume", font=(0,14), text_color="White")
     label_slider.grid(row=0, column=0, sticky="W", padx=5)
 
     sound_volume_slider = customtkinter.CTkSlider(scrollable_options, width=170, from_=0, to=1, number_of_steps=100)
     sound_volume_slider.grid(row=0, column=0, padx=70, pady=10, sticky="E")
     
-
     for i in range(len(bind_options)):
         data = bind_options[i]
         label_option_bind = customtkinter.CTkLabel(master=scrollable_options, corner_radius=0, text=data[0], font=(0,14), text_color="White")

@@ -26,7 +26,9 @@ def switch_window(event=None):
         password_entry.view_password = False
         password_entry.configure(show="*")
         image_password_label.configure(image=password_entry.image)
-        
+    
+    username_entry.focus()
+
 def label_switch_window_hover_on(event):
     label_switch_window.configure(text_color="#2e2e2e")
     app.config(cursor="hand2")
@@ -104,7 +106,7 @@ def login_window():
     if not username_entry._placeholder_text_active: username_entry.delete(0, 'end')
     if not password_entry._placeholder_text_active: password_entry.delete(0, 'end')
     if not email_entry._placeholder_text_active: email_entry.delete(0, 'end')
-    
+        
     label_switch_window.configure(text="Créer un compte")
     button_perform.configure(text="Se connecter")    
 
@@ -241,11 +243,9 @@ def run():
     
     button_perform = customtkinter.CTkButton(master=frame_components_bottom,text="Se connecter", corner_radius=0, height=65, fg_color="#67E9DA", hover_color="#436e77", font=("Arial Bold", 20), text_color="white", width=200, cursor="hand2", command=perform_button)
     button_perform.grid(row=0, column=1, sticky="e", padx=25, pady=(0,10))
-
     
     app.minsize(app.winfo_reqwidth(), app.winfo_reqheight())
 
-    #main_menu.run(app, "Thomas")
     app.mainloop()
     
 if __name__ == "__main__":

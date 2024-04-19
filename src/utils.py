@@ -79,7 +79,7 @@ def exec_python(path_script: str, args=[]) -> None:
 
     
 def get_users_csv(path: str) -> list:
-    if not os.path.exists(database_path / database_users):
+    if not os.path.exists(database_path / path):
         return []
     
     with open(path, 'r') as file:
@@ -129,7 +129,7 @@ def get_highscore(username: str):
         
     raise ValueError('Could not find user with username %s' % username)
 
-def add_highscore(username: str, score: int):
+def update_highscore(username: str, score: int):
     temp_file = NamedTemporaryFile(mode='w', delete=False, newline='', dir=database_path)
 
     with open(database_path / database_options, 'r', newline='') as csvfile, temp_file:
@@ -166,6 +166,16 @@ def update_bind_options(username: str, bind_options: list):
 
     shutil.move(temp_file.name, database_path / database_options)
     
+def get_highscore_list_sorted():
+    
+    highscores = []
+    for user_options in get_users_csv(database_path / database_options):
+        username = user_options[0]
+        highscore = user_options[1]
+        
+        highscores.append((username, highscore))
+        
+    return sorted(highscores, key=lambda x: x[1], reverse=True)
 
 
 def create_empty_csv(file_name: str):
