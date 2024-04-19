@@ -1,6 +1,7 @@
 import re, csv
 import subprocess
 import bcrypt
+import tkinter
 from customtkinter import CTkImage
 from PIL import Image
 
@@ -107,3 +108,13 @@ def create_empty_csv():
     with open(database_path / database_name, 'w', newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow([])
+        
+def reset_grids(app : tkinter.Tk):
+    for slave in app.grid_slaves():
+        slave.destroy()
+    
+    for i in range(app.grid_size()[0]):
+        app.grid_columnconfigure(i, weight=0, minsize=0)
+    
+    for i in range(app.grid_size()[1]):
+        app.grid_rowconfigure(i, weight=0, minsize=0)

@@ -243,7 +243,7 @@ def run():
 
     
     app.minsize(app.winfo_reqwidth(), app.winfo_reqheight())
-    
+
     main_menu.run(app, "Thomas")
     app.mainloop()
     
