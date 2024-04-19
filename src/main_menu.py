@@ -41,9 +41,7 @@ def key_pressed_event(event):
     
     key_code = event.keycode
     key_name = event.keysym
-    
-    print(event)
-    
+        
     if button_bind_selected is not None:
         
         if key_code == 27:
@@ -52,25 +50,22 @@ def key_pressed_event(event):
             return
         
         # TODO: update key in csv user 
+        bind_options[button_bind_selected.bind_id][1] = (key_code, key_name)
+        utils.update_bind_options(name, bind_options)
         button_bind_selected.configure(text=key_name, text_color="black")
         button_bind_selected = None
         
+        
 
 def run(application : tkinter.Tk, username : str):
-    global app
+    global app, bind_options, name
     
     app = application
+    bind_options = utils.get_bind_options(username)
+    name = username
+    
     # Reset grids to default values and remove widgets from grids
     utils.reset_grids(app)
-    
-    for slave in app.grid_slaves():
-        slave.destroy()
-    
-    for i in range(app.grid_size()[0]):
-        app.grid_columnconfigure(i, weight=0, minsize=0)
-    
-    for i in range(app.grid_size()[1]):
-        app.grid_rowconfigure(i, weight=0, minsize=0)
             
     #app.attributes("-fullscreen", True)
 
@@ -173,19 +168,13 @@ def run(application : tkinter.Tk, username : str):
     sound_volume_slider = customtkinter.CTkSlider(scrollable_options, width=170, from_=0, to=1, number_of_steps=100)
     sound_volume_slider.grid(row=0, column=0, padx=70, pady=10, sticky="E")
     
-    
-    options_data = [["Rotation", (80, "Arrow Up")], 
-                    ["Chute lente", (40,"Arrow Down")], 
-                    ["Gauche", (37,"Arrow Left")], 
-                    ["Droite", (39,"Arrow Right")],
-                    ["Chute rapide", (32, "Space")], 
-                    ["Garder", (67, "C")]]
 
-    for i in range(len(options_data)):
-        data = options_data[i]
+    for i in range(len(bind_options)):
+        data = bind_options[i]
         label_option_bind = customtkinter.CTkLabel(master=scrollable_options, corner_radius=0, text=data[0], font=(0,14), text_color="White")
         button_bind = customtkinter.CTkButton(master=scrollable_options, text=data[1][1], corner_radius=0, height=30,  fg_color="#67E9DA", hover_color="#436e77", font=("Arial Bold", 13), text_color="black", cursor="hand2")
         button_bind.configure(command=lambda button_pressed=button_bind: button_bind_pressed(button_pressed))
+        button_bind.bind_id = i
         
         label_option_bind.grid(row=i+1, column=0, sticky="W", padx=5)
         button_bind.grid(row=i+1, column=0, sticky="E", padx=(0,70), pady=5)    

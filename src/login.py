@@ -91,7 +91,8 @@ def perform_register():
     elif utils.username_exist(username_entry.get()) or utils.email_exist(email_entry.get()):
         tkinter.messagebox.showwarning(title="Erreur", message="Le compte existe déjà !")
     else:
-        utils.write_csv([username_entry.get(), email_entry.get(), password_entry.get()])
+        utils.add_user_csv([username_entry.get(), email_entry.get(), password_entry.get()])
+        utils.add_user_options_csv([username_entry.get(), 0, utils.default_bind_options])
         tkinter.messagebox.showwarning(title="Erreur", message="Le compte a été crée avec succès !")
 
         switch_window()
@@ -244,7 +245,7 @@ def run():
     
     app.minsize(app.winfo_reqwidth(), app.winfo_reqheight())
 
-    main_menu.run(app, "Thomas")
+    #main_menu.run(app, "Thomas")
     app.mainloop()
     
 if __name__ == "__main__":
