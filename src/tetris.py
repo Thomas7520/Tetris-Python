@@ -14,7 +14,8 @@ colors = {
     4: "#FFA500",
     5: "#FFFF00",
     6: "#800080",
-    7: "#00FFFF"
+    7: "#00FFFF",
+    5: "#10FFFF",
 }
 
 tetrominos = [
@@ -107,13 +108,13 @@ def refresh_playfield():
     for y in range(height):
         for x in range(width):
             color_id = playfield[y][x]
-            if color_id != 0:
+            if color_id != 0 and color_id in colors:  
                 draw_bordered_rectangle(x, y, colors[color_id])
 
     if actual_piece is not None:
         for y, ligne in enumerate(actual_piece["forme"]):
             for x, case in enumerate(ligne):
-                if case != 0:
+                if case != 0 and case in colors:  
                     piece_x = actual_piece["x"] + x
                     piece_y = actual_piece["y"] + y
                     draw_bordered_rectangle(piece_x, piece_y, colors[case])
@@ -197,14 +198,15 @@ def clear_lines():
 
 def piece_fix():
     global actual_piece
-    for y, line in enumerate(actual_piece["forme"]):
-        for x, case in enumerate(line):
-            if case != 0:
-                playfield[actual_piece["y"] + y][actual_piece["x"] + x] = case
-                print("pas draw")
-                draw_bordered_rectangle(actual_piece["x"] + x, actual_piece["y"] + y, colors[case])
-                print("Draw")
-    clear_lines()
+    if actual_piece is not None:  # Vérifier si actual_piece est non None
+        for y, line in enumerate(actual_piece["forme"]):
+            for x, case in enumerate(line):
+                if case != 0 and case in colors:  # Vérifier si case est une clé valide dans le dictionnaire colors
+                    playfield[actual_piece["y"] + y][actual_piece["x"] + x] = case
+                    print("pas draw")
+                    draw_bordered_rectangle(actual_piece["x"] + x, actual_piece["y"] + y, colors[case])
+                    print("Draw")
+        clear_lines()
 
 
 def game_loop():
