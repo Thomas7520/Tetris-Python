@@ -14,50 +14,111 @@ colors = {
     4: "#FFA500",
     5: "#FFFF00",
     6: "#800080",
-    7: "#00FFFF",
-    5: "#10FFFF",
+    7: "#00FFFF"
 }
 
-tetrominos = [
-    [[0, 0, 1],
-     [1, 1, 1]],
+tetrominos_rotations = [
+    # Tétrimino 1 (forme en T)
+    [
+        # Configuration initiale
+        [[0, 0, 1],
+         [1, 1, 1]],
+        # Rotation à 90 degrés
+        [[1, 0],
+         [1, 0],
+         [1, 1]],
+        # Rotation à 180 degrés
+        [[1, 1, 1],
+         [1, 0, 0]],
+        # Rotation à 270 degrés
+        [[1, 1],
+         [0, 1],
+         [0, 1]]
+    ],
 
-    [[0, 2, 2],
-     [2, 2, 0]],
+    # Tétrimino 2 (forme en Z)
+    [
+        # Configuration initiale
+        [[0, 2, 2],
+         [2, 2, 0]],
+        # Rotation à 90 degrés
+        [[2, 0],
+         [2, 2],
+         [0, 2]]
+    ],
 
-    [[0, 3, 0],
-     [3, 3, 3]],
+    # Tétrimino 3 (forme en L)
+    [
+        # Configuration initiale
+        [[0, 3, 0],
+         [3, 3, 3]],
+        # Rotation à 90 degrés
+        [[3, 0],
+         [3, 3],
+         [3, 0]],
+        # Rotation à 180 degrés
+        [[3, 3, 3],
+         [0, 3, 0]],
+        # Rotation à 270 degrés
+        [[0, 3],
+         [3, 3],
+         [0, 3]]
+    ],
 
-    [[4, 4, 0],
-     [0, 4, 4]],
+    # Tétrimino 4 (forme en S)
+    [
+        # Configuration initiale
+        [[4, 4, 0],
+         [0, 4, 4]],
+        # Rotation à 90 degrés
+        [[0, 4],
+         [4, 4],
+         [4, 0]]
+    ],
 
-    [[0, 5, 5],
-     [5, 5, 0]],
+    # Tétrimino 5 (forme en J)
+    [
+        # Configuration initiale
+        [[5, 0, 0],
+         [5, 5, 5]],
+        # Rotation à 90 degrés
+        [[5, 5],
+         [5, 0],
+         [5, 0]],
+        # Rotation à 180 degrés
+        [[5, 5, 5],
+         [0, 0, 5]],
+        # Rotation à 270 degrés
+        [[0, 5],
+         [0, 5],
+         [5, 5]]
+    ],
 
-    [[6, 0, 0],
-     [6, 6, 6]],
+    # Tétrimino 6 (forme en I)
+    [
+        # Configuration initiale
+        [[6],
+         [6],
+         [6],
+         [6]],
 
-    [[7],
-     [7],
-     [7],
-     [7],
-     ],
+        [[6, 6, 6, 6]]
+    ],
 
-    [[8, 8],
-     [8, 8]]
+    # Tétrimino 7 (forme en O)
+    [
+        # Configuration initiale
+        [[7, 7],
+         [7, 7]]
+    ]
 ]
 
-
 playfield = [[0] * width for _ in range(height)]
-
-
 actual_piece = None
-
 
 app = tk.Tk()
 app.title("Tetris")
 app.attributes("-fullscreen", True)
-
 
 playfield_canvas = tk.Canvas(
     app, width=width * cell_size, height=height * cell_size, bg="black")
@@ -66,31 +127,33 @@ playfield_canvas.pack(expand=1)
 
 def new_piece():
     global actual_piece
-    shape = rd.choice(tetrominos)
+    shape = rd.choice(tetrominos_rotations)
     color = rd.choice(list(colors.values()))
     actual_piece = {
         "forme": shape,
         "couleur": color,
-        "x": width // 2 - len(shape[0]) // 2,
+        "rotation": 0,
+        "x": width // 2 - len(shape[0][0]) // 2,
         "y": 0
     }
 
+
 def draw_bordered_rectangle(x, y, fill_color):
-    # Dessiner le rectangle principal avec un gradient de couleur
     grad_color_dark = darken_color(fill_color)
     grad_color_light = lighten_color(fill_color)
-    playfield_canvas.create_rectangle(x * cell_size, y * cell_size, (x + 1) * cell_size, (y + 1) * cell_size, fill=grad_color_dark, outline="", tags="piece")
-    
-    # Ajouter une bordure avec une couleur contrastante
-    playfield_canvas.create_rectangle(x * cell_size, y * cell_size, (x + 1) * cell_size, (y + 1) * cell_size, outline="black", width=2, tags="piece")
+    playfield_canvas.create_rectangle(x * cell_size, y * cell_size, (x + 1) * cell_size,
+                                      (y + 1) * cell_size, fill=grad_color_dark, outline="", tags="piece")
+    playfield_canvas.create_rectangle(x * cell_size, y * cell_size, (x + 1)
+                                      * cell_size, (y + 1) * cell_size, outline="black", width=2, tags="piece")
 
-# Fonctions pour ajuster la couleur pour le gradient
+
 def lighten_color(color, factor=1.2):
     r, g, b = hex_to_rgb(color)
     r = min(int(r * factor), 255)
     g = min(int(g * factor), 255)
     b = min(int(b * factor), 255)
     return "#{:02x}{:02x}{:02x}".format(r, g, b)
+
 
 def darken_color(color, factor=0.8):
     r, g, b = hex_to_rgb(color)
@@ -99,26 +162,61 @@ def darken_color(color, factor=0.8):
     b = max(int(b * factor), 0)
     return "#{:02x}{:02x}{:02x}".format(r, g, b)
 
+
 def hex_to_rgb(hex_color):
     hex_color = hex_color.lstrip('#')
     return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+
 
 def refresh_playfield():
     playfield_canvas.delete("piece")
     for y in range(height):
         for x in range(width):
             color_id = playfield[y][x]
-            if color_id != 0 and color_id in colors:  
+            if color_id != 0:
                 draw_bordered_rectangle(x, y, colors[color_id])
 
     if actual_piece is not None:
-        for y, ligne in enumerate(actual_piece["forme"]):
+        rotation = actual_piece["rotation"]
+        for y, ligne in enumerate(actual_piece["forme"][rotation]):
             for x, case in enumerate(ligne):
-                if case != 0 and case in colors:  
+                if case != 0:
                     piece_x = actual_piece["x"] + x
                     piece_y = actual_piece["y"] + y
                     draw_bordered_rectangle(piece_x, piece_y, colors[case])
 
+def collision(dx=0, dy=0):
+    global actual_piece
+    rotation = actual_piece["rotation"]
+    max_piece_width = max(len(line) for line in actual_piece["forme"][rotation])
+    max_piece_height = len(actual_piece["forme"][rotation])
+
+    # Nouvelles positions des limites gauche et droite après rotation
+    new_left = actual_piece["x"] + dx
+    new_right = actual_piece["x"] + max_piece_width - 1 + dx
+
+    print("New left:", new_left, "New right:", new_right, "Width:", width)
+
+    for y, ligne in enumerate(actual_piece["forme"][rotation]):
+        for x, case in enumerate(ligne):
+            if case != 0:
+                new_x, new_y = actual_piece["x"] + x , actual_piece["y"] + y 
+                print("Checking collision at:", new_x, new_y)
+                # Vérifie si la nouvelle position est en dehors des limites du terrain de jeu
+                if not (0 <= new_x <= width+1 and 0 <= new_y < height):
+                    print("Collision with boundaries!")
+                    return True
+                # Vérifie si la nouvelle position est occupée par une autre pièce
+                if playfield[new_y][new_x] != 0:
+                    print("Collision with another piece!")
+                    return True
+
+    # Vérifie si les nouvelles positions des limites gauche et droite entrent en collision avec le mur de gauche ou de droite
+    if new_left < 0 or new_right >= width:
+        print("Collision with side walls!")
+        return True
+
+    return False
 
 def move_left(event):
     if actual_piece is not None:
@@ -129,14 +227,14 @@ def move_left(event):
 
 def move_right(event):
     if actual_piece is not None:
-        if actual_piece["x"] < width - len(actual_piece["forme"][0]) and not collision(1):
+        if actual_piece["x"] < width - len(actual_piece["forme"][0][0]) and not collision(1):
             actual_piece["x"] += 1
             refresh_playfield()
 
 
 def move_down_touch(event):
     if actual_piece is not None:
-        if actual_piece["y"] < height - len(actual_piece["forme"]) and not collision(0, 1):
+        if actual_piece["y"] < height - len(actual_piece["forme"][0]) and not collision(0, 1):
             actual_piece["y"] += 1
             refresh_playfield()
 
@@ -144,7 +242,7 @@ def move_down_touch(event):
 def move_down(event=None):
     global actual_piece
     if actual_piece is not None:
-        if actual_piece["y"] < height - len(actual_piece["forme"]) and not collision(0, 1):
+        if actual_piece["y"] < height - len(actual_piece["forme"][0]) and not collision(0, 1):
             actual_piece["y"] += 1
             refresh_playfield()
             app.after(1000, move_down)
@@ -161,27 +259,15 @@ def move_down(event=None):
 
 def piece_rotation(event=None):
     if actual_piece is not None:
-        ancienne_forme = actual_piece["forme"]
-        actual_piece["forme"] = [[ancienne_forme[j][i] for j in range(
-            len(ancienne_forme))] for i in range(len(ancienne_forme[0]))]
+        rotation = (actual_piece["rotation"] + 1) % len(actual_piece["forme"])
+        old_rotation = actual_piece["rotation"]
+        actual_piece["rotation"] = rotation
         if collision():
-            actual_piece["forme"] = ancienne_forme
-        refresh_playfield()
+            actual_piece["rotation"] = old_rotation
+        else:
+            refresh_playfield()  # Rafraîchir le terrain après la rotation
 
 
-def collision(dx=0, dy=0):
-    global actual_piece
-    for y, ligne in enumerate(actual_piece["forme"]):
-        for x, case in enumerate(ligne):
-            if case != 0:
-                new_x, new_y = actual_piece["x"] + \
-                    x + dx, actual_piece["y"] + y + dy
-                if not (0 <= new_x < width and 0 <= new_y < height) or playfield[new_y][new_x] != 0:
-                    return True
-    return False
-
-
-# Modifiez la fonction clear_lines pour utiliser draw_bordered_rectangle si nécessaire
 def clear_lines():
     global playfield
     complete_lines = []
@@ -198,15 +284,12 @@ def clear_lines():
 
 def piece_fix():
     global actual_piece
-    if actual_piece is not None:  # Vérifier si actual_piece est non None
-        for y, line in enumerate(actual_piece["forme"]):
-            for x, case in enumerate(line):
-                if case != 0 and case in colors:  # Vérifier si case est une clé valide dans le dictionnaire colors
-                    playfield[actual_piece["y"] + y][actual_piece["x"] + x] = case
-                    print("pas draw")
-                    draw_bordered_rectangle(actual_piece["x"] + x, actual_piece["y"] + y, colors[case])
-                    print("Draw")
-        clear_lines()
+    rotation = actual_piece["rotation"]
+    for y, line in enumerate(actual_piece["forme"][rotation]):
+        for x, case in enumerate(line):
+            if case != 0:
+                playfield[actual_piece["y"] + y][actual_piece["x"] + x] = case
+    clear_lines()
 
 
 def game_loop():
