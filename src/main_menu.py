@@ -157,12 +157,16 @@ def run(application : tkinter.Tk, username : str):
     sound_volume_slider = customtkinter.CTkSlider(scrollable_options, width=170, from_=0, to=1, number_of_steps=4)
     sound_volume_slider.grid(row=0, column=0, padx=70, pady=10, sticky="E")
     
-    label_option_down = customtkinter.CTkLabel(master=scrollable_options, corner_radius=0, text="Descendre", font=(0,14), text_color="White")
-    button_option_down = customtkinter.CTkButton(master=scrollable_options, text="Arrow Down", corner_radius=0, height=30,  fg_color="#67E9DA", hover_color="#436e77", font=("Arial Bold", 13), text_color="black", cursor="hand2")
     
-    label_option_down.grid(row=1, column=0, sticky="W", padx=5)
-    button_option_down.grid(row=1, column=0, sticky="E", padx=(0,70))
-
+    options_data = [["Chute lente", "Arrow Down"], ["Gauche", "Arrow Left"], ["Droite", "Arrow Right"],["Chute rapide", "Space"], ["Garder", "C"]]
+   
+    for i in range(len(options_data)):
+        data = options_data[i]
+        label_option = customtkinter.CTkLabel(master=scrollable_options, corner_radius=0, text=data[0], font=(0,14), text_color="White")
+        button_option = customtkinter.CTkButton(master=scrollable_options, text=data[1], corner_radius=0, height=30,  fg_color="#67E9DA", hover_color="#436e77", font=("Arial Bold", 13), text_color="black", cursor="hand2")
+        
+        label_option.grid(row=i+1, column=0, sticky="W", padx=5)
+        button_option.grid(row=i+1, column=0, sticky="E", padx=(0,70), pady=5)    
 
     button_back = customtkinter.CTkButton(master=frame_options, text="Menu principal", corner_radius=0, height=50, fg_color="#67E9DA", hover_color="#436e77", font=("Arial Bold", 20), text_color="white", cursor="hand2", command= lambda: show_main_menu("options"))
     button_back.grid(row=2, column=0, sticky="EW", padx=15, pady=(0,10))
