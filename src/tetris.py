@@ -40,7 +40,10 @@ tetrominos = [
      [7],
      [7],
      [7],
-     ]
+     ],
+
+    [[8, 8],
+     [8, 8]]
 ]
 
 
@@ -71,26 +74,49 @@ def new_piece():
         "y": 0
     }
 
+def draw_bordered_rectangle(x, y, fill_color):
+    # Dessiner le rectangle principal avec un gradient de couleur
+    grad_color_dark = darken_color(fill_color)
+    grad_color_light = lighten_color(fill_color)
+    playfield_canvas.create_rectangle(x * cell_size, y * cell_size, (x + 1) * cell_size, (y + 1) * cell_size, fill=grad_color_dark, outline="", tags="piece")
+    
+    # Ajouter une bordure avec une couleur contrastante
+    playfield_canvas.create_rectangle(x * cell_size, y * cell_size, (x + 1) * cell_size, (y + 1) * cell_size, outline="black", width=2, tags="piece")
+
+# Fonctions pour ajuster la couleur pour le gradient
+def lighten_color(color, factor=1.2):
+    r, g, b = hex_to_rgb(color)
+    r = min(int(r * factor), 255)
+    g = min(int(g * factor), 255)
+    b = min(int(b * factor), 255)
+    return "#{:02x}{:02x}{:02x}".format(r, g, b)
+
+def darken_color(color, factor=0.8):
+    r, g, b = hex_to_rgb(color)
+    r = max(int(r * factor), 0)
+    g = max(int(g * factor), 0)
+    b = max(int(b * factor), 0)
+    return "#{:02x}{:02x}{:02x}".format(r, g, b)
+
+def hex_to_rgb(hex_color):
+    hex_color = hex_color.lstrip('#')
+    return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
 
 def refresh_playfield():
     playfield_canvas.delete("piece")
     for y in range(height):
         for x in range(width):
-            color = colors[playfield[y][x]]
-            playfield_canvas.create_rectangle(
-                x * cell_size, y * cell_size, (x + 1) * cell_size, (y + 1) * cell_size, fill=color, tags="piece")
+            color_id = playfield[y][x]
+            if color_id != 0:
+                draw_bordered_rectangle(x, y, colors[color_id])
 
     if actual_piece is not None:
         for y, ligne in enumerate(actual_piece["forme"]):
             for x, case in enumerate(ligne):
                 if case != 0:
-                    couleur = actual_piece["couleur"]
-                    playfield_canvas.create_rectangle((actual_piece["x"] + x) * cell_size, (actual_piece["y"] + y) * cell_size,
-                                                      (actual_piece["x"] + x + 1) * cell_size, (
-                                                          actual_piece["y"] + y + 1) * cell_size,
-                                                      fill=couleur, tags="piece")
-
-# Fonction pour déplacer la pièce actuelle vers la gauche
+                    piece_x = actual_piece["x"] + x
+                    piece_y = actual_piece["y"] + y
+                    draw_bordered_rectangle(piece_x, piece_y, colors[case])
 
 
 def move_left(event):
@@ -98,8 +124,6 @@ def move_left(event):
         if actual_piece["x"] > 0 and not collision(-1):
             actual_piece["x"] -= 1
             refresh_playfield()
-
-# Fonction pour déplacer la pièce actuelle vers la droite
 
 
 def move_right(event):
@@ -156,6 +180,7 @@ def collision(dx=0, dy=0):
     return False
 
 
+# Modifiez la fonction clear_lines pour utiliser draw_bordered_rectangle si nécessaire
 def clear_lines():
     global playfield
     complete_lines = []
@@ -175,8 +200,10 @@ def piece_fix():
     for y, line in enumerate(actual_piece["forme"]):
         for x, case in enumerate(line):
             if case != 0:
-                playfield[actual_piece["y"] + y][actual_piece["x"] +
-                                                 x] = list(colors.values()).index(actual_piece["couleur"])
+                playfield[actual_piece["y"] + y][actual_piece["x"] + x] = case
+                print("pas draw")
+                draw_bordered_rectangle(actual_piece["x"] + x, actual_piece["y"] + y, colors[case])
+                print("Draw")
     clear_lines()
 
 
