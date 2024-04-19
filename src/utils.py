@@ -19,39 +19,15 @@ database_path = root_path / "database"
 
 # 0: username, 1: email, 2: password
 database_users = "database_users.csv"
-# 0: username, 1: highscore, 2: bind
+# 0: username, 1: highscore, 2: bind_options 
+# TODO: add volume value between highscore and bind_options (forgotten)
 database_options = "database_options.csv"
 
 default_bind_options = [['Rotation', (80, 'Up')], ['Chute lente', (40,'Down')],['Gauche', (37,'Left')],['Droite', (39,'Right')],['Chute rapide', (32, 'Space')], ['Garder', (67, 'C')]]
+default_volume = 50
 
 def is_valid_email(email):
     return re.compile(r'^[\w\.-]+@[\w\.-]+\.\w+$').match(email)
-
-def round_rectangle(canvas, x1, y1, x2, y2, radius=25, **kwargs):
-        
-    points = [x1+radius, y1,
-              x1+radius, y1,
-              x2-radius, y1,
-              x2-radius, y1,
-              x2, y1,
-              x2, y1+radius,
-              x2, y1+radius,
-              x2, y2-radius,
-              x2, y2-radius,
-              x2, y2,
-              x2-radius, y2,
-              x2-radius, y2,
-              x1+radius, y2,
-              x1+radius, y2,
-              x1, y2,
-              x1, y2-radius,
-              x1, y2-radius,
-              x1, y1+radius,
-              x1, y1+radius,
-              x1, y1]
-
-    return canvas.create_polygon(points, **kwargs, smooth=True)
-
 
 def get_image(name: str, width: int, height: int) -> CTkImage:
     """
