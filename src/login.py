@@ -238,7 +238,7 @@ def run():
     label_switch_window.bind("<Button-1>", switch_window)
     label_switch_window.grid(row=0, column=0, sticky="w", padx=25, pady=(0,10))
     
-    button_perform = customtkinter.CTkButton(master=frame_components_bottom,text="Se connecter", corner_radius=0, height=65, bg_color="#67E9DA", fg_color="#67E9DA", hover_color="#436e77", font=("Arial Bold", 20), text_color="white", width=200, cursor="hand2", command=perform_button)
+    button_perform = customtkinter.CTkButton(master=frame_components_bottom,text="Se connecter", corner_radius=0, height=65, fg_color="#67E9DA", hover_color="#436e77", font=("Arial Bold", 20), text_color="white", width=200, cursor="hand2", command=perform_button)
     button_perform.grid(row=0, column=1, sticky="e", padx=25, pady=(0,10))
 
     

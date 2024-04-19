@@ -1,9 +1,5 @@
 import sys, os
 import utils
-
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "login"))
-import sign_up
-
 import login
 
 if __name__ == "__main__":    

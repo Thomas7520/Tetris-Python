@@ -37,13 +37,20 @@ def run(app : tkinter.Tk, username : str):
     frame_buttons.grid_rowconfigure(0, weight=1)
     frame_buttons.grid_rowconfigure(1, weight=1)
     frame_buttons.grid_rowconfigure(2, weight=1)
-    frame_buttons.grid(row=0, column=0, pady=(300,0))
+    frame_buttons.grid_rowconfigure(3, weight=1)
+    frame_buttons.grid(row=0, column=0, pady=(370,0))
     
-    button_play = customtkinter.CTkButton(master=frame_buttons, text="Jouer", corner_radius=0, height=65, bg_color="#67E9DA", fg_color="#67E9DA", hover_color="#436e77", font=("Arial Bold", 20), text_color="white", width=200, cursor="hand2")
-    button_play.grid(row=0, column=0, sticky="EW", pady=5, padx=25)
+    width_button = 250
+    padx_button = 15
     
-    button_leaderboard = customtkinter.CTkButton(master=frame_buttons, text="Leaderboard", corner_radius=0, height=65, bg_color="#67E9DA", fg_color="#67E9DA", hover_color="#436e77", font=("Arial Bold", 20), text_color="white", width=200, cursor="hand2")
-    button_leaderboard.grid(row=1, column=0, sticky="EW", pady=5, padx=25)
+    button_play = customtkinter.CTkButton(master=frame_buttons, text="Jouer", corner_radius=0, height=65, fg_color="#67E9DA", hover_color="#436e77", font=("Arial Bold", 20), text_color="white", width=width_button, cursor="hand2")
+    button_play.grid(row=0, column=0, sticky="EW", pady=5, padx=padx_button)
     
-    button_quit = customtkinter.CTkButton(master=frame_buttons, text="Quitter", corner_radius=0, height=65, bg_color="#67E9DA", fg_color="#67E9DA", hover_color="#436e77", font=("Arial Bold", 20), text_color="white", width=200, cursor="hand2")
-    button_quit.grid(row=2, column=0, sticky="EW", pady=5, padx=25)
+    button_leaderboard = customtkinter.CTkButton(master=frame_buttons, text="Leaderboard", corner_radius=0, height=65, fg_color="#67E9DA", hover_color="#436e77", font=("Arial Bold", 20), text_color="white", width=width_button, cursor="hand2")
+    button_leaderboard.grid(row=1, column=0, sticky="EW", pady=5, padx=padx_button)
+    
+    button_option = customtkinter.CTkButton(master=frame_buttons, text="Leaderboard", corner_radius=0, height=65, fg_color="#67E9DA", hover_color="#436e77", font=("Arial Bold", 20), text_color="white", width=width_button, cursor="hand2")
+    button_option.grid(row=2, column=0, sticky="EW", pady=5, padx=padx_button)
+    
+    button_quit = customtkinter.CTkButton(master=frame_buttons, text="Quitter", corner_radius=0, height=65, fg_color="#67E9DA", hover_color="#436e77", font=("Arial Bold", 20), text_color="white", width=width_button, cursor="hand2")
+    button_quit.grid(row=3, column=0, sticky="EW", pady=5, padx=padx_button)
