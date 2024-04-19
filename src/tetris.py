@@ -124,6 +124,7 @@ playfield_canvas = tk.Canvas(
     app, width=width * cell_size, height=height * cell_size, bg="black")
 playfield_canvas.pack(expand=1)
 
+
 def new_piece():
     global actual_piece
     shape = rd.choice(tetrominos_rotations)
@@ -136,11 +137,15 @@ def new_piece():
         "y": 0
     }
 
+
 def draw_bordered_rectangle(x, y, fill_color):
     grad_color_dark = darken_color(fill_color)
     grad_color_light = lighten_color(fill_color)
-    playfield_canvas.create_rectangle(x * cell_size, y * cell_size, (x + 1) * cell_size, (y + 1) * cell_size, fill=grad_color_dark, outline="", tags="piece")
-    playfield_canvas.create_rectangle(x * cell_size, y * cell_size, (x + 1) * cell_size, (y + 1) * cell_size, outline="black", width=2, tags="piece")
+    playfield_canvas.create_rectangle(x * cell_size, y * cell_size, (x + 1) * cell_size,
+                                      (y + 1) * cell_size, fill=grad_color_dark, outline="", tags="piece")
+    playfield_canvas.create_rectangle(x * cell_size, y * cell_size, (x + 1)
+                                      * cell_size, (y + 1) * cell_size, outline="black", width=2, tags="piece")
+
 
 def lighten_color(color, factor=1.2):
     r, g, b = hex_to_rgb(color)
@@ -149,6 +154,7 @@ def lighten_color(color, factor=1.2):
     b = min(int(b * factor), 255)
     return "#{:02x}{:02x}{:02x}".format(r, g, b)
 
+
 def darken_color(color, factor=0.8):
     r, g, b = hex_to_rgb(color)
     r = max(int(r * factor), 0)
@@ -156,14 +162,17 @@ def darken_color(color, factor=0.8):
     b = max(int(b * factor), 0)
     return "#{:02x}{:02x}{:02x}".format(r, g, b)
 
+
 def hex_to_rgb(hex_color):
     hex_color = hex_color.lstrip('#')
     return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+
 
 def preview_piece():
     if actual_piece is not None:
         temp_piece = actual_piece.copy()
         for rotation in range(len(temp_piece["forme"])):
+            print(rotation)
             temp_piece["rotation"] = rotation
             for y_offset in range(height - len(temp_piece["forme"][rotation]), -1, -1):
                 temp_piece["y"] = y_offset
@@ -171,6 +180,7 @@ def preview_piece():
                     refresh_playfield()
                     draw_preview_piece(temp_piece)
                     return
+
 
 def collision_preview(piece):
     rotation = piece["rotation"]
@@ -183,22 +193,20 @@ def collision_preview(piece):
                     return True
     return False
 
+
 def draw_preview_piece(piece):
+    playfield_canvas.delete("preview")
     rotation = piece["rotation"]
     for y, ligne in enumerate(piece["forme"][rotation]):
         for x, case in enumerate(ligne):
             if case != 0:
                 piece_x = piece["x"] + x
                 piece_y = piece["y"] + y
-                fill_color = colors[case]
-                fill_color_transparent = adjust_transparency(fill_color)
-                draw_bordered_rectangle(piece_x, piece_y, fill_color_transparent)
-
-
-
-def adjust_transparency(color, alpha=0.5):
-    r, g, b = hex_to_rgb(color)
-    return f"#{r:02x}{g:02x}{b:02x}{int(alpha*255):02x}"
+                playfield_canvas.create_rectangle(
+                    piece_x * cell_size, piece_y * cell_size,
+                    (piece_x + 1) * cell_size, (piece_y + 1) * cell_size,
+                    outline="#FFFFFF", width=2, tag="preview"
+                )
 
 
 def refresh_playfield():
@@ -218,12 +226,14 @@ def refresh_playfield():
                     piece_y = actual_piece["y"] + y
                     draw_bordered_rectangle(piece_x, piece_y, colors[case])
 
+
 def move_left(event):
     if actual_piece is not None:
         if actual_piece["x"] > 0 and not collision(-1):
             actual_piece["x"] -= 1
             refresh_playfield()
             preview_piece()
+
 
 def move_right(event):
     if actual_piece is not None:
@@ -232,12 +242,14 @@ def move_right(event):
             refresh_playfield()
             preview_piece()
 
+
 def move_down_touch(event):
     if actual_piece is not None:
         if actual_piece["y"] < height - len(actual_piece["forme"][0]) and not collision(0, 1):
             actual_piece["y"] += 1
             refresh_playfield()
             preview_piece()
+
 
 def move_down(event=None):
     global actual_piece
@@ -257,6 +269,16 @@ def move_down(event=None):
         refresh_playfield()
         app.after(1000, move_down)
 
+
+def drop_piece(event):
+    global actual_piece
+    while not collision(0, 1):
+        actual_piece["y"] += 1
+    piece_fix()
+    new_piece()
+    refresh_playfield()
+
+
 def piece_rotation(event=None):
     if actual_piece is not None:
         rotation = (actual_piece["rotation"] + 1) % len(actual_piece["forme"])
@@ -264,7 +286,9 @@ def piece_rotation(event=None):
         actual_piece["rotation"] = rotation
         if collision():
             actual_piece["rotation"] = old_rotation
+        preview_piece()
         refresh_playfield()
+
 
 def collision(dx=0, dy=0):
     global actual_piece
@@ -277,6 +301,7 @@ def collision(dx=0, dy=0):
                 if not (0 <= new_x < width and 0 <= new_y < height) or playfield[new_y][new_x] != 0:
                     return True
     return False
+
 
 def clear_lines():
     global playfield
@@ -291,6 +316,7 @@ def clear_lines():
 
     refresh_playfield()
 
+
 def piece_fix():
     global actual_piece
     rotation = actual_piece["rotation"]
@@ -300,24 +326,29 @@ def piece_fix():
                 playfield[actual_piece["y"] + y][actual_piece["x"] + x] = case
     clear_lines()
 
+
 def game_loop():
     new_piece()
     refresh_playfield()
     app.after(500, move_down)
+
 
 def threading_game_loop():
     game_thread = th.Thread(target=game_loop)
     game_thread.daemon = True
     game_thread.start()
 
+
 def main():
     app.bind("<Left>", move_left)
     app.bind("<Right>", move_right)
     app.bind("<Down>", move_down_touch)
     app.bind("<Up>", piece_rotation)
+    app.bind("<space>", drop_piece)
 
     threading_game_loop()
     app.mainloop()
+
 
 if __name__ == "__main__":
     main()
