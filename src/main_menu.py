@@ -1,19 +1,49 @@
 import tkinter, customtkinter, utils
 
 def run(app : tkinter.Tk, username : str):
+
+    # Reset grids to default values and remove widgets from grids
+    
     for slave in app.grid_slaves():
         slave.destroy()
     
-    app.attributes("-fullscreen", True)
+    for i in range(app.grid_size()[0]):
+        app.grid_columnconfigure(i, weight=0, minsize=0)
     
+    for i in range(app.grid_size()[1]):
+        app.grid_rowconfigure(i, weight=0, minsize=0)
+            
+    app.attributes("-fullscreen", True)
+
+    
+    
+    app.grid_columnconfigure(0, weight=1)
+    app.grid_rowconfigure(0, weight=1)
+
     
     image_canvas = customtkinter.CTkCanvas(app, background="#96B5BA", highlightthickness=0)
-    image_canvas.pack()
+    image_canvas.grid_columnconfigure(0, weight=1)
+    image_canvas.grid_rowconfigure(0, weight=1)
+
+    image_canvas.grid(row=0, column=0, sticky="NSWE")
 
     title_image = utils.get_image("main_menu_tetris_logo.png", 1000 * 1.5, 694 * 1.5)
 
     image_title_label = customtkinter.CTkLabel(master=image_canvas, text="", image=title_image, bg_color="#96B5BA")
-    image_title_label.pack()
+    image_title_label.grid(row=0, column=0, sticky="NSWE")
 
-    button_perform = customtkinter.CTkButton(master=image_canvas, text="Se connecter", corner_radius=0, height=65, bg_color="#67E9DA", fg_color="#67E9DA", hover_color="#436e77", font=("Arial Bold", 20), text_color="white", width=200, cursor="hand2")
-    button_perform.place(relx=0.5, rely=0.5, in_=image_canvas)
+    frame_buttons = customtkinter.CTkFrame(master=image_canvas, fg_color="#3566c9", bg_color="#3566c9")
+    frame_buttons.grid_columnconfigure(0, weight=1)
+    frame_buttons.grid_rowconfigure(0, weight=1)
+    frame_buttons.grid_rowconfigure(1, weight=1)
+    frame_buttons.grid_rowconfigure(2, weight=1)
+    frame_buttons.grid(row=0, column=0, pady=(300,0))
+    
+    button_play = customtkinter.CTkButton(master=frame_buttons, text="Jouer", corner_radius=0, height=65, bg_color="#67E9DA", fg_color="#67E9DA", hover_color="#436e77", font=("Arial Bold", 20), text_color="white", width=200, cursor="hand2")
+    button_play.grid(row=0, column=0, sticky="EW", pady=5, padx=25)
+    
+    button_leaderboard = customtkinter.CTkButton(master=frame_buttons, text="Leaderboard", corner_radius=0, height=65, bg_color="#67E9DA", fg_color="#67E9DA", hover_color="#436e77", font=("Arial Bold", 20), text_color="white", width=200, cursor="hand2")
+    button_leaderboard.grid(row=1, column=0, sticky="EW", pady=5, padx=25)
+    
+    button_quit = customtkinter.CTkButton(master=frame_buttons, text="Quitter", corner_radius=0, height=65, bg_color="#67E9DA", fg_color="#67E9DA", hover_color="#436e77", font=("Arial Bold", 20), text_color="white", width=200, cursor="hand2")
+    button_quit.grid(row=2, column=0, sticky="EW", pady=5, padx=25)
