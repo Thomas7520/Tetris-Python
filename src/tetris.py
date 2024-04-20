@@ -171,15 +171,14 @@ def hex_to_rgb(hex_color):
 def preview_piece():
     if actual_piece is not None:
         temp_piece = actual_piece.copy()
-        for rotation in range(len(temp_piece["forme"])):
-            print(rotation)
-            temp_piece["rotation"] = rotation
-            for y_offset in range(height - len(temp_piece["forme"][rotation]), -1, -1):
-                temp_piece["y"] = y_offset
-                if not collision_preview(temp_piece):
-                    refresh_playfield()
-                    draw_preview_piece(temp_piece)
-                    return
+        rotation = actual_piece["rotation"]
+        temp_piece["rotation"] = rotation
+        for y_offset in range(height - len(temp_piece["forme"][rotation]), -1, -1):
+            temp_piece["y"] = y_offset
+            if not collision_preview(temp_piece):
+                refresh_playfield()
+                draw_preview_piece(temp_piece)
+                return
 
 
 def collision_preview(piece):
@@ -210,12 +209,22 @@ def draw_preview_piece(piece):
 
 
 def refresh_playfield():
+    playfield_canvas.delete("grid")
     playfield_canvas.delete("piece")
+
     for y in range(height):
         for x in range(width):
             color_id = playfield[y][x]
             if color_id != 0:
                 draw_bordered_rectangle(x, y, colors[color_id])
+
+    grid_color = "#353535"
+    for y in range(height):
+        playfield_canvas.create_line(
+            0, y * cell_size, width * cell_size, y * cell_size, fill=grid_color, tag="grid")
+    for x in range(width):
+        playfield_canvas.create_line(
+            x * cell_size, 0, x * cell_size, height * cell_size, fill=grid_color, tag="grid")
 
     if actual_piece is not None:
         rotation = actual_piece["rotation"]
@@ -237,7 +246,7 @@ def move_left(event):
 
 def move_right(event):
     if actual_piece is not None:
-        if actual_piece["x"] < width - len(actual_piece["forme"][0][0]) and not collision(1):
+        if actual_piece["x"] < width and not collision(1):
             actual_piece["x"] += 1
             refresh_playfield()
             preview_piece()
@@ -257,7 +266,7 @@ def move_down(event=None):
         if actual_piece["y"] < height - len(actual_piece["forme"][0]) and not collision(0, 1):
             actual_piece["y"] += 1
             refresh_playfield()
-            preview_piece()  # Ajout de la prévisualisation
+            preview_piece() 
             app.after(1000, move_down)
         else:
             piece_fix()
@@ -296,8 +305,7 @@ def collision(dx=0, dy=0):
     for y, ligne in enumerate(actual_piece["forme"][rotation]):
         for x, case in enumerate(ligne):
             if case != 0:
-                new_x, new_y = actual_piece["x"] + \
-                    x + dx, actual_piece["y"] + y + dy
+                new_x, new_y = actual_piece["x"] + x + dx, actual_piece["y"] + y + dy
                 if not (0 <= new_x < width and 0 <= new_y < height) or playfield[new_y][new_x] != 0:
                     return True
     return False
