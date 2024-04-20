@@ -3,18 +3,18 @@ import random as rd
 import threading as th
 
 width = 10
-height = 20
+height = 22
 cell_size = 32
 
 colors = {
-    0: "#000000",
-    1: "#FF0000",
-    2: "#00FF00",
-    3: "#0000FF",
-    4: "#FFA500",
-    5: "#FFFF00",
-    6: "#800080",
-    7: "#00FFFF"
+    0: "#000000",  
+    1: "#FF0000",  
+    2: "#00FF00",  
+    3: "#0000FF",  
+    4: "#FFA500",  
+    5: "#FFFF00",  
+    6: "#800080",  
+    7: "#00FFFF"   
 }
 
 tetrominos_rotations = [
@@ -115,6 +115,10 @@ tetrominos_rotations = [
 
 playfield = [[0] * width for _ in range(height)]
 actual_piece = None
+score = 0
+game_over = False
+level = 1
+lines_cleared = 0
 
 app = tk.Tk()
 app.title("Tetris")
@@ -126,16 +130,19 @@ playfield_canvas.pack(expand=1)
 
 
 def new_piece():
-    global actual_piece
-    shape = rd.choice(tetrominos_rotations)
-    color = rd.choice(list(colors.values()))
-    actual_piece = {
-        "forme": shape,
-        "couleur": color,
-        "rotation": 0,
-        "x": width // 2 - len(shape[0][0]) // 2,
-        "y": 0
-    }
+    global actual_piece, game_over
+    if not game_over:
+        shape = rd.choice(tetrominos_rotations)
+        color = rd.choice(list(colors.values()))
+        actual_piece = {
+            "forme": shape,
+            "couleur": color,
+            "rotation": 0,
+            "x": width // 2 - len(shape[0][0]) // 2,
+            "y": 0
+        }
+        if collision():
+            game_over = True
 
 
 def draw_bordered_rectangle(x, y, fill_color):
@@ -237,7 +244,7 @@ def refresh_playfield():
 
 
 def move_left(event):
-    if actual_piece is not None:
+    if actual_piece is not None and not game_over:
         if actual_piece["x"] > 0 and not collision(-1):
             actual_piece["x"] -= 1
             refresh_playfield()
@@ -245,7 +252,7 @@ def move_left(event):
 
 
 def move_right(event):
-    if actual_piece is not None:
+    if actual_piece is not None and not game_over:
         if actual_piece["x"] < width and not collision(1):
             actual_piece["x"] += 1
             refresh_playfield()
@@ -253,7 +260,7 @@ def move_right(event):
 
 
 def move_down_touch(event):
-    if actual_piece is not None:
+    if actual_piece is not None and not game_over:
         if actual_piece["y"] < height - len(actual_piece["forme"][0]) and not collision(0, 1):
             actual_piece["y"] += 1
             refresh_playfield()
@@ -261,35 +268,36 @@ def move_down_touch(event):
 
 
 def move_down(event=None):
-    global actual_piece
-    if actual_piece is not None:
+    global actual_piece, score, lines_cleared, level
+    if actual_piece is not None and not game_over:
         if actual_piece["y"] < height - len(actual_piece["forme"][0]) and not collision(0, 1):
             actual_piece["y"] += 1
             refresh_playfield()
-            preview_piece() 
-            app.after(1000, move_down)
+            preview_piece()
+            app.after(500 - (level * 50), move_down)
         else:
             piece_fix()
             new_piece()
             refresh_playfield()
-            app.after(1000, move_down)
-    else:
-        new_piece()
-        refresh_playfield()
-        app.after(1000, move_down)
+            app.after(500 - (level * 50), move_down)
+            update_score()
+            check_level()
 
 
 def drop_piece(event):
-    global actual_piece
-    while not collision(0, 1):
-        actual_piece["y"] += 1
-    piece_fix()
-    new_piece()
-    refresh_playfield()
+    global actual_piece, score, lines_cleared, level
+    if actual_piece is not None and not game_over:
+        while not collision(0, 1):
+            actual_piece["y"] += 1
+        piece_fix()
+        new_piece()
+        refresh_playfield()
+        update_score()
+        check_level()
 
 
 def piece_rotation(event=None):
-    if actual_piece is not None:
+    if actual_piece is not None and not game_over:
         rotation = (actual_piece["rotation"] + 1) % len(actual_piece["forme"])
         old_rotation = actual_piece["rotation"]
         actual_piece["rotation"] = rotation
@@ -305,18 +313,29 @@ def collision(dx=0, dy=0):
     for y, ligne in enumerate(actual_piece["forme"][rotation]):
         for x, case in enumerate(ligne):
             if case != 0:
-                new_x, new_y = actual_piece["x"] + x + dx, actual_piece["y"] + y + dy
+                new_x, new_y = actual_piece["x"] + \
+                    x + dx, actual_piece["y"] + y + dy
                 if not (0 <= new_x < width and 0 <= new_y < height) or playfield[new_y][new_x] != 0:
                     return True
     return False
 
 
 def clear_lines():
-    global playfield
+    global playfield, score, lines_cleared
     complete_lines = []
     for y in range(height):
         if all(playfield[y]):
             complete_lines.append(y)
+
+    lines_cleared += len(complete_lines)
+    if len(complete_lines) == 1:
+        score += 40 * (level + 1)
+    elif len(complete_lines) == 2:
+        score += 100 * (level + 1)
+    elif len(complete_lines) == 3:
+        score += 300 * (level + 1)
+    elif len(complete_lines) == 4:
+        score += 1200 * (level + 1)
 
     for y in complete_lines:
         playfield.pop(y)
@@ -338,13 +357,37 @@ def piece_fix():
 def game_loop():
     new_piece()
     refresh_playfield()
-    app.after(500, move_down)
+    app.after(500 - (level * 50), move_down)
 
 
 def threading_game_loop():
     game_thread = th.Thread(target=game_loop)
     game_thread.daemon = True
     game_thread.start()
+
+
+def update_score():
+    global score, game_over, level, lines_cleared
+    if game_over:
+        playfield_canvas.create_text(width * cell_size // 2, height *
+                                     cell_size // 2, text="Game Over", fill="white", font=("Arial", 30))
+        playfield_canvas.create_text(width * cell_size // 2, height * cell_size //
+                                     2 + 50, text="Score: {}".format(score), fill="white", font=("Arial", 20))
+    else:
+        playfield_canvas.delete("score")
+        playfield_canvas.create_text(width * cell_size // 2, cell_size // 2,
+                                     text="Score: {}".format(score), fill="white", font=("Arial", 20), tag="score")
+        playfield_canvas.create_text(width * cell_size // 2, cell_size // 2 + 30, text="Lines: {}".format(
+            lines_cleared), fill="white", font=("Arial", 20), tag="score")
+        playfield_canvas.create_text(width * cell_size // 2, cell_size // 2 + 60,
+                                     text="Level: {}".format(level), fill="white", font=("Arial", 20), tag="score")
+
+
+def check_level():
+    global level, lines_cleared
+    if lines_cleared >= 10 * level:
+        level += 1
+        lines_cleared = 0
 
 
 def main():
