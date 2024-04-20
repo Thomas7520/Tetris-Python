@@ -262,7 +262,7 @@ def move_right(event):
 
 def move_down_touch(event):
     if actual_piece is not None and not game_over:
-        if actual_piece["y"] < height - len(actual_piece["forme"][0]) and not collision(0, 1):
+        if actual_piece["y"] < height  and not collision(0, 1):
             actual_piece["y"] += 1
             refresh_playfield()
             preview_piece()
