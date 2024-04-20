@@ -36,10 +36,7 @@ Niveau est le niveau actuel du joueur.
 
 Niveau=⌊ 
 Lignes_par_niveau
-Nombre_total_de_lignes_effac 
-e
-ˊ
- es
+Nombre_total_de_lignes_effaceˊes
 ​
  ⌋+1
 
