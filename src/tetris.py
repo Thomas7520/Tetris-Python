@@ -119,10 +119,11 @@ score = 0
 game_over = False
 level = 1
 lines_cleared = 0
-
+acceleration_coef = 1
 app = tk.Tk()
 app.title("Tetris")
 app.attributes("-fullscreen", True)
+speed = round(800 / (1 + level * acceleration_coef))
 
 playfield_canvas = tk.Canvas(
     app, width=width * cell_size, height=height * cell_size, bg="black")
@@ -141,8 +142,8 @@ def new_piece():
             "x": width // 2 - len(shape[0][0]) // 2,
             "y": 0
         }
-        if collision():
-            game_over = True
+    if collision():
+        game_over = True
 
 
 def draw_bordered_rectangle(x, y, fill_color):
@@ -267,19 +268,19 @@ def move_down_touch(event):
             preview_piece()
 
 
-def move_down(event=None):
+def move_down():
     global actual_piece, score, lines_cleared, level
     if actual_piece is not None and not game_over:
         if actual_piece["y"] < height - len(actual_piece["forme"][0]) and not collision(0, 1):
             actual_piece["y"] += 1
             refresh_playfield()
             preview_piece()
-            app.after(500 - (level * 50), move_down)
+            app.after(speed, move_down)
         else:
             piece_fix()
             new_piece()
             refresh_playfield()
-            app.after(500 - (level * 50), move_down)
+            app.after(speed, move_down)
             update_score()
             check_level()
 
@@ -291,9 +292,10 @@ def drop_piece(event):
             actual_piece["y"] += 1
         piece_fix()
         new_piece()
-        refresh_playfield()
         update_score()
         check_level()
+        refresh_playfield()
+        
 
 
 def piece_rotation(event=None):
@@ -357,7 +359,7 @@ def piece_fix():
 def game_loop():
     new_piece()
     refresh_playfield()
-    app.after(500 - (level * 50), move_down)
+    app.after(speed,move_down)
 
 
 def threading_game_loop():
