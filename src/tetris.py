@@ -7,14 +7,14 @@ height = 22
 cell_size = 32
 
 colors = {
-    0: "#000000",  
-    1: "#FF0000",  
-    2: "#00FF00",  
-    3: "#0000FF",  
-    4: "#FFA500",  
-    5: "#FFFF00",  
-    6: "#800080",  
-    7: "#00FFFF"   
+    0: "#000000",
+    1: "#FF0000",
+    2: "#00FF00",
+    3: "#0000FF",
+    4: "#FFA500",
+    5: "#FFFF00",
+    6: "#800080",
+    7: "#00FFFF"
 }
 
 tetrominos_rotations = [
@@ -262,7 +262,7 @@ def move_right(event):
 
 def move_down_touch(event):
     if actual_piece is not None and not game_over:
-        if actual_piece["y"] < height  and not collision(0, 1):
+        if actual_piece["y"] < height and not collision(0, 1):
             actual_piece["y"] += 1
             refresh_playfield()
             preview_piece()
@@ -271,7 +271,7 @@ def move_down_touch(event):
 def move_down():
     global actual_piece, score, lines_cleared, level
     if actual_piece is not None and not game_over:
-        if actual_piece["y"] < height - len(actual_piece["forme"][0]) and not collision(0, 1):
+        if actual_piece["y"] < height and not collision(0, 1):
             actual_piece["y"] += 1
             refresh_playfield()
             preview_piece()
@@ -295,7 +295,6 @@ def drop_piece(event):
         update_score()
         check_level()
         refresh_playfield()
-        
 
 
 def piece_rotation(event=None):
@@ -359,7 +358,7 @@ def piece_fix():
 def game_loop():
     new_piece()
     refresh_playfield()
-    app.after(speed,move_down)
+    app.after(speed, move_down)
 
 
 def threading_game_loop():
