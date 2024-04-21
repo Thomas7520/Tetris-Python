@@ -52,7 +52,7 @@ def key_pressed_event(event):
         for bind in bind_options:
             if bind[1][0] == key_code and bind[0] != bind_options[button_bind_selected.bind_id][0]: # We don't care about assigning same value on the same bind
                 # match, can't assign this twice
-                tkinter.messagebox.showwarning(title="Conflit", message=f"Cette touche a déjà été assigné à la touche '{bind[0]}' !")
+                tkinter.messagebox.showwarning(title="Conflit", message=f"Cette touche a déjà été assigné à '{bind[0]}' !")
                 button_bind_selected.configure(text=button_bind_selected.cget('text')[1:-1], text_color="black")
                 button_bind_selected = None
                 return
