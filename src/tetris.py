@@ -6,6 +6,10 @@ width = 10
 height = 22
 cell_size = 32
 
+SIDE_CELL_SIZE = 32
+SIDE_CANVAS_WIDTH = 4 * cell_size
+SIDE_CANVAS_HEIGHT = 4 * cell_size
+
 colors = {
     0: "#000000",
     1: "#FF0000",
@@ -125,10 +129,8 @@ app.title("Tetris")
 app.attributes("-fullscreen", True)
 speed = round(800 / (1 + level * acceleration_coef))
 
-playfield_canvas = tk.Canvas(
-    app, width=width * cell_size, height=height * cell_size, bg="black")
-playfield_canvas.pack(expand=1)
-
+waiting_piece = None
+c_use = False
 
 def new_piece():
     global actual_piece, game_over
@@ -191,14 +193,19 @@ def preview_piece():
 
 def collision_preview(piece):
     rotation = piece["rotation"]
+    if not collision(0, 1):  # Tant qu'il n'y a pas de collision vers le bas
+        piece["y"] += 1  # Déplacer la pièce vers le bas
+    piece["y"] -= 1  # Revenir d'un pas vers le haut car la pièce a maintenant collision
     for y, ligne in enumerate(piece["forme"][rotation]):
         for x, case in enumerate(ligne):
             if case != 0:
                 piece_x = piece["x"] + x
                 piece_y = piece["y"] + y
+                # Vérifier si la case est en dehors des limites de la grille ou en contact avec une pièce existante
                 if not (0 <= piece_x < width and 0 <= piece_y < height) or playfield[piece_y][piece_x] != 0:
                     return True
     return False
+
 
 
 def draw_preview_piece(piece):
@@ -269,7 +276,7 @@ def move_down_touch(event):
 
 
 def move_down():
-    global actual_piece, score, lines_cleared, level
+    global actual_piece, score, lines_cleared, level, c_use
     if actual_piece is not None and not game_over:
         if actual_piece["y"] < height and not collision(0, 1):
             actual_piece["y"] += 1
@@ -283,10 +290,13 @@ def move_down():
             app.after(speed, move_down)
             update_score()
             check_level()
+            c_use = False
+
+            
 
 
 def drop_piece(event):
-    global actual_piece, score, lines_cleared, level
+    global actual_piece, score, lines_cleared, level, c_use
     if actual_piece is not None and not game_over:
         while not collision(0, 1):
             actual_piece["y"] += 1
@@ -295,6 +305,8 @@ def drop_piece(event):
         update_score()
         check_level()
         refresh_playfield()
+        score += 10
+        c_use = False
 
 
 def piece_rotation(event=None):
@@ -346,14 +358,30 @@ def clear_lines():
 
 
 def piece_fix():
-    global actual_piece
+    global actual_piece, c_use 
     rotation = actual_piece["rotation"]
     for y, line in enumerate(actual_piece["forme"][rotation]):
         for x, case in enumerate(line):
             if case != 0:
                 playfield[actual_piece["y"] + y][actual_piece["x"] + x] = case
+    c_use = False
     clear_lines()
 
+
+
+def change_piece(event=None):
+    global actual_piece, waiting_piece, c_use
+    if not c_use:
+        if waiting_piece is None:
+            waiting_piece = actual_piece
+            new_piece()
+        else:
+            actual_piece, waiting_piece = waiting_piece, actual_piece
+            actual_piece["x"] = width // 2 - len(actual_piece["forme"][actual_piece["rotation"]][0]) // 2
+            actual_piece["y"] = 0
+        refresh_side_piece()
+        refresh_playfield()
+    c_use = True
 
 def game_loop():
     new_piece()
@@ -391,13 +419,45 @@ def check_level():
         lines_cleared = 0
 
 
+def refresh_side_piece():
+    if waiting_piece is not None:
+        draw_side_piece(waiting_piece)
+    else:
+        side_canvas.delete("side_piece")
+
+def draw_side_piece(piece):
+    side_canvas.delete("side_piece")
+    rotation = piece["rotation"]
+    piece_color = piece["couleur"]  # Utiliser la même couleur que la pièce actuelle
+    piece_form = piece["forme"][rotation]
+    # Calculer les coordonnées pour dessiner la pièce mise de côté au milieu du canvas
+    start_x = (4 - len(piece_form[0])) * SIDE_CELL_SIZE // 2
+    start_y = (4 - len(piece_form)) * SIDE_CELL_SIZE // 2
+    for y, ligne in enumerate(piece_form):
+        for x, case in enumerate(ligne):
+            if case != 0:
+                side_canvas.create_rectangle(
+                    start_x + x * SIDE_CELL_SIZE, start_y + y * SIDE_CELL_SIZE,
+                    start_x + (x + 1) * SIDE_CELL_SIZE, start_y + (y + 1) * SIDE_CELL_SIZE,
+                    fill=piece_color, outline="#000000", width=2, tags="side_piece")
+
 def main():
+    global playfield_canvas, side_canvas
     app.bind("<Left>", move_left)
     app.bind("<Right>", move_right)
     app.bind("<Down>", move_down_touch)
     app.bind("<Up>", piece_rotation)
     app.bind("<space>", drop_piece)
+    app.bind("c", change_piece)
 
+    playfield_canvas = tk.Canvas(
+        app, width=width * cell_size, height=height * cell_size, bg="black")
+    playfield_canvas.pack(expand=1)
+    
+    side_canvas = tk.Canvas(
+        app, width=4 * cell_size, height=4 * cell_size, bg="black")
+    side_canvas.place(x=(app.winfo_width() - width * cell_size - SIDE_CANVAS_WIDTH) // 2 - SIDE_CANVAS_WIDTH, y=(app.winfo_height() - SIDE_CANVAS_HEIGHT) // 2)
+    
     threading_game_loop()
     app.mainloop()
 
