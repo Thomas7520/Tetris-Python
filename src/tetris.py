@@ -463,19 +463,32 @@ def toggle_pause(event=None):
     global paused, pause_canvas
     paused = not paused
     if paused:
-        pause_canvas = tk.Canvas(app, width=200, height=100, bg="black")
-        pause_canvas.place(x=(app.winfo_width() - 200) // 2,
-                           y=(app.winfo_height() - 100) // 2)
+        # Créer un canvas pour afficher l'écran de pause
+        pause_canvas = tk.Canvas(app, width=300, height=200, bg="black")
         pause_canvas.create_text(
-            100, 40, text="Paused", fill="white", font=("Arial", 30))
-        pause_canvas.create_text(100, 70, text="Score: {}".format(
-            score - 10), fill="white", font=("Arial", 16), tags="score_text")
-        home = tk.Button(app, text="Home", command=lambda: home)
-        quit = tk.Button(app, text="Quit", command=lambda: quit)
-        play = tk.Button(app, text="Play", command=lambda: pause_game)
-        restart = tk.Button(app, text="Restart", command=lambda: restart)
+            150, 50, text="Paused", fill="white", font=("Arial", 30))
+        pause_canvas.create_text(150, 90, text="Score: {}".format(
+            score - 10 if score != 0 else score), fill="white", font=("Arial", 16), tags="score_text")
+
+        # Ajouter des boutons pour les options de pause
+        home_button = tk.Button(pause_canvas, text="Home", command=home)
+        quit_button = tk.Button(pause_canvas, text="Quit", command=quit)
+        play_button = tk.Button(pause_canvas, text="Play", command=pause_game)
+        restart_button = tk.Button(
+            pause_canvas, text="Restart", command=restart)
+
+        # Placer les boutons sur le canvas en utilisant place
+        home_button.place(x=50, y=130)
+        quit_button.place(x=150, y=130)
+        play_button.place(x=250, y=130)
+        restart_button.place(x=350, y=130)
+
+        # Centrer le canvas sur la fenêtre principale
+        pause_canvas.place(x=(app.winfo_width() - 300) // 2,
+                           y=(app.winfo_height() - 200) // 2)
     else:
-        pause_canvas.place_forget()
+        # Supprimer le canvas de pause lorsque le jeu reprend
+        pause_canvas.destroy()
         move_down()
 
 
