@@ -132,6 +132,9 @@ speed = round(800 / (1 + level * acceleration_coef))
 waiting_piece = None
 c_use = False
 
+paused = False
+
+
 def new_piece():
     global actual_piece, game_over
     if not game_over:
@@ -193,9 +196,6 @@ def preview_piece():
 
 def collision_preview(piece):
     rotation = piece["rotation"]
-    if not collision(0, 1):  # Tant qu'il n'y a pas de collision vers le bas
-        piece["y"] += 1  # Déplacer la pièce vers le bas
-    piece["y"] -= 1  # Revenir d'un pas vers le haut car la pièce a maintenant collision
     for y, ligne in enumerate(piece["forme"][rotation]):
         for x, case in enumerate(ligne):
             if case != 0:
@@ -205,7 +205,6 @@ def collision_preview(piece):
                 if not (0 <= piece_x < width and 0 <= piece_y < height) or playfield[piece_y][piece_x] != 0:
                     return True
     return False
-
 
 
 def draw_preview_piece(piece):
@@ -276,8 +275,8 @@ def move_down_touch(event):
 
 
 def move_down():
-    global actual_piece, score, lines_cleared, level, c_use
-    if actual_piece is not None and not game_over:
+    global actual_piece, score, lines_cleared, level, c_use, paused
+    if actual_piece is not None and not game_over and not paused:
         if actual_piece["y"] < height and not collision(0, 1):
             actual_piece["y"] += 1
             refresh_playfield()
@@ -291,8 +290,6 @@ def move_down():
             update_score()
             check_level()
             c_use = False
-
-            
 
 
 def drop_piece(event):
@@ -358,7 +355,7 @@ def clear_lines():
 
 
 def piece_fix():
-    global actual_piece, c_use 
+    global actual_piece, c_use
     rotation = actual_piece["rotation"]
     for y, line in enumerate(actual_piece["forme"][rotation]):
         for x, case in enumerate(line):
@@ -366,7 +363,6 @@ def piece_fix():
                 playfield[actual_piece["y"] + y][actual_piece["x"] + x] = case
     c_use = False
     clear_lines()
-
 
 
 def change_piece(event=None):
@@ -377,11 +373,13 @@ def change_piece(event=None):
             new_piece()
         else:
             actual_piece, waiting_piece = waiting_piece, actual_piece
-            actual_piece["x"] = width // 2 - len(actual_piece["forme"][actual_piece["rotation"]][0]) // 2
+            actual_piece["x"] = width // 2 - \
+                len(actual_piece["forme"][actual_piece["rotation"]][0]) // 2
             actual_piece["y"] = 0
         refresh_side_piece()
         refresh_playfield()
     c_use = True
+
 
 def game_loop():
     new_piece()
@@ -425,12 +423,13 @@ def refresh_side_piece():
     else:
         side_canvas.delete("side_piece")
 
+
 def draw_side_piece(piece):
     side_canvas.delete("side_piece")
     rotation = piece["rotation"]
-    piece_color = piece["couleur"]  # Utiliser la même couleur que la pièce actuelle
+    piece_color = piece["couleur"]
     piece_form = piece["forme"][rotation]
-    # Calculer les coordonnées pour dessiner la pièce mise de côté au milieu du canvas
+
     start_x = (4 - len(piece_form[0])) * SIDE_CELL_SIZE // 2
     start_y = (4 - len(piece_form)) * SIDE_CELL_SIZE // 2
     for y, ligne in enumerate(piece_form):
@@ -438,8 +437,51 @@ def draw_side_piece(piece):
             if case != 0:
                 side_canvas.create_rectangle(
                     start_x + x * SIDE_CELL_SIZE, start_y + y * SIDE_CELL_SIZE,
-                    start_x + (x + 1) * SIDE_CELL_SIZE, start_y + (y + 1) * SIDE_CELL_SIZE,
+                    start_x + (x + 1) * SIDE_CELL_SIZE, start_y +
+                    (y + 1) * SIDE_CELL_SIZE,
                     fill=piece_color, outline="#000000", width=2, tags="side_piece")
+
+
+def home():
+    pass
+
+
+def quit():
+    app.destroy()
+
+
+def restart():
+    playfield = [[0] * width for _ in range(height)]
+    actual_piece = new_piece()
+    score = 0
+    game_over = False
+    level = 1
+    lines_cleared = 0
+
+
+def toggle_pause(event=None):
+    global paused, pause_canvas
+    paused = not paused
+    if paused:
+        pause_canvas = tk.Canvas(app, width=200, height=100, bg="black")
+        pause_canvas.place(x=(app.winfo_width() - 200) // 2,
+                           y=(app.winfo_height() - 100) // 2)
+        pause_canvas.create_text(
+            100, 40, text="Paused", fill="white", font=("Arial", 30))
+        pause_canvas.create_text(100, 70, text="Score: {}".format(
+            score - 10), fill="white", font=("Arial", 16), tags="score_text")
+        home = tk.Button(app, text="Home", command=lambda: home)
+        quit = tk.Button(app, text="Quit", command=lambda: quit)
+        play = tk.Button(app, text="Play", command=lambda: pause_game)
+        restart = tk.Button(app, text="Restart", command=lambda: restart)
+    else:
+        pause_canvas.place_forget()
+        move_down()
+
+
+def pause_game():
+    toggle_pause()
+
 
 def main():
     global playfield_canvas, side_canvas
@@ -449,15 +491,21 @@ def main():
     app.bind("<Up>", piece_rotation)
     app.bind("<space>", drop_piece)
     app.bind("c", change_piece)
+    app.bind("<Escape>", toggle_pause)
+
+    # Créer un bouton pour la pause
+    pause_button = tk.Button(app, text="Pause", command=pause_game)
+    pause_button.pack()
 
     playfield_canvas = tk.Canvas(
         app, width=width * cell_size, height=height * cell_size, bg="black")
     playfield_canvas.pack(expand=1)
-    
+
     side_canvas = tk.Canvas(
         app, width=4 * cell_size, height=4 * cell_size, bg="black")
-    side_canvas.place(x=(app.winfo_width() - width * cell_size - SIDE_CANVAS_WIDTH) // 2 - SIDE_CANVAS_WIDTH, y=(app.winfo_height() - SIDE_CANVAS_HEIGHT) // 2)
-    
+    side_canvas.place(x=(app.winfo_width() - width * cell_size - SIDE_CANVAS_WIDTH) //
+                      2 - SIDE_CANVAS_WIDTH, y=(app.winfo_height() - SIDE_CANVAS_HEIGHT*4) // 2)
+
     threading_game_loop()
     app.mainloop()
 
