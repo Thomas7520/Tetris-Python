@@ -451,12 +451,15 @@ def quit():
 
 
 def restart():
+    global playfield, actual_piece, score, game_over, level, lines_cleared
     playfield = [[0] * width for _ in range(height)]
     actual_piece = new_piece()
     score = 0
     game_over = False
     level = 1
     lines_cleared = 0
+    toggle_pause()
+    move_down()
 
 
 def toggle_pause(event=None):
@@ -464,28 +467,29 @@ def toggle_pause(event=None):
     paused = not paused
     if paused:
         # Créer un canvas pour afficher l'écran de pause
-        pause_canvas = tk.Canvas(app, width=300, height=200, bg="black")
+        pause_canvas = tk.Canvas(app, width=300, height=500, bg="black")
         pause_canvas.create_text(
             150, 50, text="Paused", fill="white", font=("Arial", 30))
         pause_canvas.create_text(150, 90, text="Score: {}".format(
             score - 10 if score != 0 else score), fill="white", font=("Arial", 16), tags="score_text")
-
+        
+        pause_canvas
         # Ajouter des boutons pour les options de pause
-        home_button = tk.Button(pause_canvas, text="Home", command=home)
-        quit_button = tk.Button(pause_canvas, text="Quit", command=quit)
-        play_button = tk.Button(pause_canvas, text="Play", command=pause_game)
-        restart_button = tk.Button(
-            pause_canvas, text="Restart", command=restart)
+        home_button = tk.Button(pause_canvas, text="Home", command= lambda : home())
+        quit_button = tk.Button(pause_canvas, text="Quit", command= lambda : quit())
+        play_button = tk.Button(pause_canvas, text="Play", command= lambda : pause_game())
 
         # Placer les boutons sur le canvas en utilisant place
-        home_button.place(x=50, y=130)
-        quit_button.place(x=150, y=130)
-        play_button.place(x=250, y=130)
-        restart_button.place(x=350, y=130)
+        play_button.grid(row=0, column=0)
+        home_button.grid(row=1, column=0)
+        quit_button.grid(row=2, column=0)
 
         # Centrer le canvas sur la fenêtre principale
         pause_canvas.place(x=(app.winfo_width() - 300) // 2,
-                           y=(app.winfo_height() - 200) // 2)
+                           y=(app.winfo_height() - 500) // 2)
+        
+        pause_canvas.config(width=300, height=500)
+
     else:
         # Supprimer le canvas de pause lorsque le jeu reprend
         pause_canvas.destroy()
