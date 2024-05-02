@@ -2,6 +2,9 @@ import tkinter as tk
 import random as rd
 import threading as th
 import customtkinter as ctk
+import sys
+import utils
+
 width = 10
 height = 22
 cell_size = 32
@@ -150,7 +153,6 @@ def new_piece():
         }
     if collision():
         game_over = True
-        
 
 
 def draw_bordered_rectangle(x, y, fill_color):
@@ -400,11 +402,6 @@ def threading_game_loop():
 def update_score():
     global score, game_over, level, lines_cleared
     if game_over:
-        playfield_canvas.create_text(width * cell_size // 2, height *
-                                     cell_size // 2, text="Game Over", fill="white", font=("Arial", 30))
-        playfield_canvas.create_text(width * cell_size // 2, height * cell_size //
-                                     2 + 50, text="Score: {}".format(score), fill="white", font=("Arial", 20))
-        # Appeler game_over_screen() ici
         game_over_screen()
     else:
         playfield_canvas.delete("score")
@@ -414,7 +411,6 @@ def update_score():
             lines_cleared), fill="white", font=("Arial", 20), tag="score")
         playfield_canvas.create_text(width * cell_size // 2, cell_size // 2 + 60,
                                      text="Level: {}".format(level), fill="white", font=("Arial", 20), tag="score")
-
 
 
 def check_level():
@@ -465,7 +461,6 @@ def draw_side_piece(piece):
     for y, ligne in enumerate(piece_form):
         for x, case in enumerate(ligne):
             if case != 0:
-                # Dessiner chaque case de la pièce
                 rectangle_side_canvas.create_rectangle(
                     start_x + x * SIDE_CELL_SIZE, start_y + y * SIDE_CELL_SIZE,
                     start_x + (x + 1) * SIDE_CELL_SIZE, start_y +
@@ -481,19 +476,6 @@ def home():
 def quit():
     app.destroy()
 
-
-def game_over_screen():
-    if game_over:
-        def build_screen():
-            loose_canvas = ctk.CTkFrame(
-                app, width=300, height=300, corner_radius=8, border_width=4, fg_color="black")
-            loose_label = ctk.CTkLabel(
-                pause_canvas, text="Game Over", fg_color="black", font=("Arial", 30))
-            
-            loose_canvas.place(x=(app.winfo_width() - 300) // 2,
-                               y=(app.winfo_height() - 300) // 2)
-    else:
-        pass
 
 def toggle_pause(event=None):
     global paused, pause_canvas
@@ -572,6 +554,75 @@ def pause_game():
     toggle_pause()
 
 
+def game_over_screen():
+    global game_over_canvas, score, lines_cleared
+
+    # Créer le cadre pour l'écran de fin de partie
+    game_over_canvas = ctk.CTkFrame(
+        app, width=300, height=300, corner_radius=8, border_width=4, fg_color="black")
+
+    # Ajouter une étiquette pour afficher "Game Over"
+    game_over_label = ctk.CTkLabel(
+        game_over_canvas, text="Game Over", fg_color="black", font=("Arial", 35))
+    game_over_label.place(relx=0.5, rely=0.2, anchor=tk.CENTER)
+
+    # Positionner le cadre de fin de partie au centre de la fenêtre
+    game_over_canvas.place(x=(app.winfo_width() - 300) // 2,
+                           y=(app.winfo_height() - 300) // 2)
+
+    # Charger les images des boutons
+    home_img = utils.get_image("home_icon.png", 50, 50)
+    restart_img = utils.get_image("restart_icon.png", 50, 50)
+    quit_img = utils.get_image("quit_icon.png", 50, 50)
+
+    # Créer les boutons d'accueil, de redémarrage et de quitter
+    home_button = ctk.CTkButton(game_over_canvas, image=home_img, command=home,
+                                text="", width=50, height=50, fg_color="#999999", hover_color="#7a7a7a", border_width=3,
+                                border_color="#bfbfbf",
+                                corner_radius=8,)
+    restart_button = ctk.CTkButton(
+        game_over_canvas, image=restart_img, command=restart_game, text="", width=50, height=50, fg_color="#5dd55d", hover_color="#4ee44e", border_width=3,
+        border_color="#90ee90",
+        corner_radius=8,)
+    quit_button = ctk.CTkButton(game_over_canvas, image=quit_img, command=quit,
+                                text="", width=50, height=50, fg_color="#999999", hover_color="#7a7a7a", border_width=3,
+                                border_color="#bfbfbf",
+                                corner_radius=8,)
+    score_label = ctk.CTkLabel(game_over_canvas, text="Score : {} \n\n Lines cleared : {}".format(
+        score, lines_cleared), font=("Arial", 20))
+
+    score_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+
+    home_button.place(relx=0.25, rely=0.8, anchor=tk.CENTER)
+    restart_button.place(relx=0.5, rely=0.8, anchor=tk.CENTER)
+    quit_button.place(relx=0.75, rely=0.8, anchor=tk.CENTER)
+
+
+def restart_game():
+    global game_over, score, lines_cleared, level, playfield, actual_piece, waiting_piece
+
+    game_over = False
+    score = 0
+    lines_cleared = 0
+    level = 1
+
+    playfield = [[0] * width for _ in range(height)]
+
+    actual_piece = None
+    waiting_piece = None
+
+    update_score()
+
+    threading_game_loop()
+
+    refresh_playfield()
+
+    refresh_side_piece()
+
+    if 'game_over_canvas' in globals():
+        game_over_canvas.destroy()
+
+
 def main():
     global playfield_canvas, side_canvas, rectangle_side_canvas
     app.bind("<Left>", move_left)
@@ -590,7 +641,8 @@ def main():
         app, width=width * cell_size, height=height * cell_size, bg="black")
     playfield_canvas.pack(expand=1)
 
-    app.update()
+    if sys.platform == "win32":
+        app.update()
     side_canvas = ctk.CTkFrame(
         app, width=4 * cell_size, height=4 * cell_size, corner_radius=8, fg_color="Black")
     side_canvas.place(x=(app.winfo_width() - width * cell_size - SIDE_CANVAS_WIDTH) //
