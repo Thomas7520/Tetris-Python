@@ -117,6 +117,7 @@ tetrominos_rotations = [
     ]
 ]
 
+
 playfield = [[0] * width for _ in range(height)]
 actual_piece = None
 score = 0
@@ -149,6 +150,7 @@ def new_piece():
         }
     if collision():
         game_over = True
+        
 
 
 def draw_bordered_rectangle(x, y, fill_color):
@@ -402,6 +404,8 @@ def update_score():
                                      cell_size // 2, text="Game Over", fill="white", font=("Arial", 30))
         playfield_canvas.create_text(width * cell_size // 2, height * cell_size //
                                      2 + 50, text="Score: {}".format(score), fill="white", font=("Arial", 20))
+        # Appeler game_over_screen() ici
+        game_over_screen()
     else:
         playfield_canvas.delete("score")
         playfield_canvas.create_text(width * cell_size // 2, cell_size // 2,
@@ -410,6 +414,7 @@ def update_score():
             lines_cleared), fill="white", font=("Arial", 20), tag="score")
         playfield_canvas.create_text(width * cell_size // 2, cell_size // 2 + 60,
                                      text="Level: {}".format(level), fill="white", font=("Arial", 20), tag="score")
+
 
 
 def check_level():
@@ -463,10 +468,10 @@ def draw_side_piece(piece):
                 # Dessiner chaque case de la pièce
                 rectangle_side_canvas.create_rectangle(
                     start_x + x * SIDE_CELL_SIZE, start_y + y * SIDE_CELL_SIZE,
-                    start_x + (x + 1) * SIDE_CELL_SIZE, start_y + (y + 1) * SIDE_CELL_SIZE,
+                    start_x + (x + 1) * SIDE_CELL_SIZE, start_y +
+                    (y + 1) * SIDE_CELL_SIZE,
                     fill=piece_color, outline="#000000", width=2, tags="side_piece"
                 )
-
 
 
 def home():
@@ -477,77 +482,90 @@ def quit():
     app.destroy()
 
 
+def game_over_screen():
+    if game_over:
+        def build_screen():
+            loose_canvas = ctk.CTkFrame(
+                app, width=300, height=300, corner_radius=8, border_width=4, fg_color="black")
+            loose_label = ctk.CTkLabel(
+                pause_canvas, text="Game Over", fg_color="black", font=("Arial", 30))
+            
+            loose_canvas.place(x=(app.winfo_width() - 300) // 2,
+                               y=(app.winfo_height() - 300) // 2)
+    else:
+        pass
+
 def toggle_pause(event=None):
     global paused, pause_canvas
+    if not game_over:
+        def create_pause_menu():
 
-    def create_pause_menu():
+            pause_canvas = ctk.CTkFrame(
+                app, width=300, height=300, corner_radius=8, border_width=4, fg_color="black")
 
-        pause_canvas = ctk.CTkFrame(
-            app, width=300, height=300, corner_radius=8, border_width=4, fg_color="black")
+            pause_label = ctk.CTkLabel(
+                pause_canvas, text="Paused", fg_color="black", font=("Arial", 30))
+            pause_label.place(relx=0.5, rely=0.2, anchor=tk.CENTER)
 
-        pause_label = ctk.CTkLabel(
-            pause_canvas, text="Paused", fg_color="black", font=("Arial", 30))
-        pause_label.place(relx=0.5, rely=0.2, anchor=tk.CENTER)
+            button_frame = tk.Frame(pause_canvas, bg="#000000")
 
-        button_frame = tk.Frame(pause_canvas, bg="#000000")
+            play_button = ctk.CTkButton(master=button_frame,
+                                        width=250,
+                                        height=40,
+                                        fg_color="#5dd55d",
+                                        text_color="black",
+                                        border_width=3,
+                                        border_color="#90ee90",
+                                        corner_radius=8,
+                                        text="Resume",
+                                        hover_color="#4ee44e",
+                                        command=lambda: toggle_pause())
 
-        play_button = ctk.CTkButton(master=button_frame,
-                                    width=250,
-                                    height=40,
-                                    fg_color="#5dd55d",
-                                    text_color="black",
-                                    border_width=3,
-                                    border_color="#90ee90",
-                                    corner_radius=8,
-                                    text="Resume",
-                                    hover_color="#4ee44e",
-                                    command=lambda: toggle_pause())
+            home_button = ctk.CTkButton(master=button_frame,
+                                        width=250,
+                                        height=40,
+                                        fg_color="#999999",
+                                        text_color="black",
+                                        border_width=3,
+                                        border_color="#bfbfbf",
+                                        corner_radius=8,
+                                        text="Home",
+                                        hover_color="#7a7a7a",
+                                        command=lambda: home())
 
-        home_button = ctk.CTkButton(master=button_frame,
-                                    width=250,
-                                    height=40,
-                                    fg_color="#999999",
-                                    text_color="black",
-                                    border_width=3,
-                                    border_color="#bfbfbf",
-                                    corner_radius=8,
-                                    text="Home",
-                                    hover_color="#7a7a7a",
-                                    command=lambda: home())
+            quit_button = ctk.CTkButton(master=button_frame,
+                                        width=250,
+                                        height=40,
+                                        fg_color="#999999",
+                                        text_color="black",
+                                        border_width=3,
+                                        border_color="#bfbfbf",
+                                        corner_radius=8,
+                                        text="Quit",
+                                        hover_color="#7a7a7a",
+                                        command=lambda: quit())
 
-        quit_button = ctk.CTkButton(master=button_frame,
-                                    width=250,
-                                    height=40,
-                                    fg_color="#999999",
-                                    text_color="black",
-                                    border_width=3,
-                                    border_color="#bfbfbf",
-                                    corner_radius=8,
-                                    text="Quit",
-                                    hover_color="#7a7a7a",
-                                    command=lambda: quit())
+            # Placer les boutons dans le cadre
+            play_button.pack(fill=tk.X, padx=10, pady=10)
+            home_button.pack(fill=tk.X, padx=10, pady=10)
+            quit_button.pack(fill=tk.X, padx=10, pady=10)
 
-        # Placer les boutons dans le cadre
-        play_button.pack(fill=tk.X, padx=10, pady=10)
-        home_button.pack(fill=tk.X, padx=10, pady=10)
-        quit_button.pack(fill=tk.X, padx=10, pady=10)
+            # Centrer le cadre sur le pause_canvas
+            button_frame.place(relx=0.5, rely=0.6, anchor=tk.CENTER)
 
-        # Centrer le cadre sur le pause_canvas
-        button_frame.place(relx=0.5, rely=0.6, anchor=tk.CENTER)
+            # Centrer le pause_canvas sur la fenêtre principale
+            pause_canvas.place(x=(app.winfo_width() - 300) // 2,
+                               y=(app.winfo_height() - 300) // 2)
 
-        # Centrer le pause_canvas sur la fenêtre principale
-        pause_canvas.place(x=(app.winfo_width() - 300) // 2,
-                           y=(app.winfo_height() - 300) // 2)
+            return pause_canvas
 
-        return pause_canvas
-
-    paused = not paused
-    if paused:
-        pause_canvas = create_pause_menu()
-    else:
-        # Supprimer le canvas de pause lorsque le jeu reprend
-        pause_canvas.destroy()
-        move_down()
+        paused = not paused
+        if paused:
+            pause_canvas = create_pause_menu()
+        else:
+            # Supprimer le canvas de pause lorsque le jeu reprend
+            pause_canvas.destroy()
+            move_down()
 
 
 def pause_game():
@@ -572,15 +590,16 @@ def main():
         app, width=width * cell_size, height=height * cell_size, bg="black")
     playfield_canvas.pack(expand=1)
 
+    app.update()
     side_canvas = ctk.CTkFrame(
         app, width=4 * cell_size, height=4 * cell_size, corner_radius=8, fg_color="Black")
     side_canvas.place(x=(app.winfo_width() - width * cell_size - SIDE_CANVAS_WIDTH) //
                       2 - SIDE_CANVAS_WIDTH, y=(app.winfo_height() - SIDE_CANVAS_HEIGHT*4) // 2)
 
     rectangle_side_canvas = tk.Canvas(
-        side_canvas, width = 4 * cell_size - 20, height  = 4 * cell_size - 20, bg="black", border = False)
+        side_canvas, width=4 * cell_size - 20, height=4 * cell_size - 20, bg="black", border=False)
 
-    rectangle_side_canvas.place(relx = 0.5 , rely = 0.5 , anchor = tk.CENTER)
+    rectangle_side_canvas.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
     threading_game_loop()
     app.mainloop()
