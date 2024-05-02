@@ -588,8 +588,8 @@ def game_over_screen():
                                 text="", width=50, height=50, fg_color="#999999", hover_color="#7a7a7a", border_width=3,
                                 border_color="#bfbfbf",
                                 corner_radius=8,)
-    score_label = ctk.CTkLabel(game_over_canvas, text="Score : {} \n\n Lines cleared : {}".format(
-        score, lines_cleared), font=("Arial", 20))
+    score_label = ctk.CTkLabel(game_over_canvas, text="Score : {} \n\n Level : {}".format(
+        score, level), font=("Arial", 20))
 
     score_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
