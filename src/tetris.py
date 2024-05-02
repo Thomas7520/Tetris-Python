@@ -270,7 +270,6 @@ def move_down_touch(event):
     if actual_piece is not None and not game_over:
         if actual_piece["y"] < height and not collision(0, 1):
             actual_piece["y"] += 1
-            score += 1
             refresh_playfield()
             preview_piece()
 
@@ -305,7 +304,7 @@ def drop_piece(event):
         update_score()
         check_level()
         refresh_playfield()
-        score += 5 * (cpt //3)
+        score += 5 * (cpt // 3)
         c_use = False
 
 
@@ -348,7 +347,7 @@ def clear_lines():
     elif len(complete_lines) == 3:
         score += 500 * level
     elif len(complete_lines) == 4:
-        score += 800 * level 
+        score += 800 * level
 
     for y in complete_lines:
         playfield.pop(y)
@@ -431,7 +430,7 @@ def check_level():
         level = 8
     elif lines_cleared == 80:
         level = 9
-    elif lines_cleared == 90: 
+    elif lines_cleared == 90:
         level = 10
 
 
@@ -439,25 +438,35 @@ def refresh_side_piece():
     if waiting_piece is not None:
         draw_side_piece(waiting_piece)
     else:
-        side_canvas.delete("side_piece")
+        rectangle_side_canvas.delete("side_piece")
 
 
 def draw_side_piece(piece):
-    side_canvas.delete("side_piece")
+    rectangle_side_canvas.delete("side_piece")
     rotation = piece["rotation"]
     piece_color = piece["couleur"]
     piece_form = piece["forme"][rotation]
 
-    start_x = (4 - len(piece_form[0])) * SIDE_CELL_SIZE // 2
-    start_y = (4 - len(piece_form)) * SIDE_CELL_SIZE // 2
+    # Calculer les dimensions du rectangle_side_canvas et de la pièce
+    canvas_width = rectangle_side_canvas.winfo_width()
+    canvas_height = rectangle_side_canvas.winfo_height()
+    piece_width = len(piece_form[0])
+    piece_height = len(piece_form)
+
+    # Calculer les coordonnées pour centrer la pièce dans le rectangle_side_canvas
+    start_x = (canvas_width - piece_width * SIDE_CELL_SIZE) // 2
+    start_y = (canvas_height - piece_height * SIDE_CELL_SIZE) // 2
+
     for y, ligne in enumerate(piece_form):
         for x, case in enumerate(ligne):
             if case != 0:
-                side_canvas.create_rectangle(
+                # Dessiner chaque case de la pièce
+                rectangle_side_canvas.create_rectangle(
                     start_x + x * SIDE_CELL_SIZE, start_y + y * SIDE_CELL_SIZE,
-                    start_x + (x + 1) * SIDE_CELL_SIZE, start_y +
-                    (y + 1) * SIDE_CELL_SIZE,
-                    fill=piece_color, outline="#000000", width=2, tags="side_piece")
+                    start_x + (x + 1) * SIDE_CELL_SIZE, start_y + (y + 1) * SIDE_CELL_SIZE,
+                    fill=piece_color, outline="#000000", width=2, tags="side_piece"
+                )
+
 
 
 def home():
@@ -474,7 +483,7 @@ def toggle_pause(event=None):
     def create_pause_menu():
 
         pause_canvas = ctk.CTkFrame(
-            app, width=300, height=300, corner_radius=8, border_width= 4,fg_color="black")
+            app, width=300, height=300, corner_radius=8, border_width=4, fg_color="black")
 
         pause_label = ctk.CTkLabel(
             pause_canvas, text="Paused", fg_color="black", font=("Arial", 30))
@@ -491,7 +500,7 @@ def toggle_pause(event=None):
                                     border_color="#90ee90",
                                     corner_radius=8,
                                     text="Resume",
-                                    hover_color= "#4ee44e",
+                                    hover_color="#4ee44e",
                                     command=lambda: toggle_pause())
 
         home_button = ctk.CTkButton(master=button_frame,
@@ -503,7 +512,7 @@ def toggle_pause(event=None):
                                     border_color="#bfbfbf",
                                     corner_radius=8,
                                     text="Home",
-                                    hover_color= "#7a7a7a",
+                                    hover_color="#7a7a7a",
                                     command=lambda: home())
 
         quit_button = ctk.CTkButton(master=button_frame,
@@ -515,7 +524,7 @@ def toggle_pause(event=None):
                                     border_color="#bfbfbf",
                                     corner_radius=8,
                                     text="Quit",
-                                    hover_color= "#7a7a7a",
+                                    hover_color="#7a7a7a",
                                     command=lambda: quit())
 
         # Placer les boutons dans le cadre
@@ -546,7 +555,7 @@ def pause_game():
 
 
 def main():
-    global playfield_canvas, side_canvas
+    global playfield_canvas, side_canvas, rectangle_side_canvas
     app.bind("<Left>", move_left)
     app.bind("<Right>", move_right)
     app.bind("<Down>", move_down_touch)
@@ -563,10 +572,15 @@ def main():
         app, width=width * cell_size, height=height * cell_size, bg="black")
     playfield_canvas.pack(expand=1)
 
-    side_canvas = tk.Canvas(
-        app, width=4 * cell_size, height=4 * cell_size, bg="black")
+    side_canvas = ctk.CTkFrame(
+        app, width=4 * cell_size, height=4 * cell_size, corner_radius=8, fg_color="Black")
     side_canvas.place(x=(app.winfo_width() - width * cell_size - SIDE_CANVAS_WIDTH) //
                       2 - SIDE_CANVAS_WIDTH, y=(app.winfo_height() - SIDE_CANVAS_HEIGHT*4) // 2)
+
+    rectangle_side_canvas = tk.Canvas(
+        side_canvas, width = 4 * cell_size - 20, height  = 4 * cell_size - 20, bg="black", border = False)
+
+    rectangle_side_canvas.place(relx = 0.5 , rely = 0.5 , anchor = tk.CENTER)
 
     threading_game_loop()
     app.mainloop()
