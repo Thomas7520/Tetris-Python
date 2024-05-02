@@ -1,7 +1,7 @@
 import tkinter as tk
 import random as rd
 import threading as th
-
+import customtkinter as ctk
 width = 10
 height = 22
 cell_size = 32
@@ -270,6 +270,7 @@ def move_down_touch(event):
     if actual_piece is not None and not game_over:
         if actual_piece["y"] < height and not collision(0, 1):
             actual_piece["y"] += 1
+            score += 1
             refresh_playfield()
             preview_piece()
 
@@ -295,14 +296,16 @@ def move_down():
 def drop_piece(event):
     global actual_piece, score, lines_cleared, level, c_use
     if actual_piece is not None and not game_over:
+        cpt = 0
         while not collision(0, 1):
             actual_piece["y"] += 1
+            cpt += 1
         piece_fix()
         new_piece()
         update_score()
         check_level()
         refresh_playfield()
-        score += 10
+        score += 5 * (cpt //3)
         c_use = False
 
 
@@ -339,13 +342,13 @@ def clear_lines():
 
     lines_cleared += len(complete_lines)
     if len(complete_lines) == 1:
-        score += 40 * (level + 1)
+        score += 100 * level
     elif len(complete_lines) == 2:
-        score += 100 * (level + 1)
+        score += 300 * level
     elif len(complete_lines) == 3:
-        score += 300 * (level + 1)
+        score += 500 * level
     elif len(complete_lines) == 4:
-        score += 1200 * (level + 1)
+        score += 800 * level 
 
     for y in complete_lines:
         playfield.pop(y)
@@ -412,9 +415,24 @@ def update_score():
 
 def check_level():
     global level, lines_cleared
-    if lines_cleared >= 10 * level:
-        level += 1
-        lines_cleared = 0
+    if lines_cleared == 10:
+        level = 2
+    elif lines_cleared == 20:
+        level = 3
+    elif lines_cleared == 30:
+        level = 4
+    elif lines_cleared == 40:
+        level = 5
+    elif lines_cleared == 50:
+        level = 6
+    elif lines_cleared == 60:
+        level = 7
+    elif lines_cleared == 70:
+        level = 8
+    elif lines_cleared == 80:
+        level = 9
+    elif lines_cleared == 90: 
+        level = 10
 
 
 def refresh_side_piece():
@@ -450,46 +468,73 @@ def quit():
     app.destroy()
 
 
-def restart():
-    global playfield, actual_piece, score, game_over, level, lines_cleared
-    playfield = [[0] * width for _ in range(height)]
-    actual_piece = new_piece()
-    score = 0
-    game_over = False
-    level = 1
-    lines_cleared = 0
-    toggle_pause()
-    move_down()
-
-
 def toggle_pause(event=None):
     global paused, pause_canvas
+
+    def create_pause_menu():
+
+        pause_canvas = ctk.CTkFrame(
+            app, width=300, height=300, corner_radius=8, border_width= 4,fg_color="black")
+
+        pause_label = ctk.CTkLabel(
+            pause_canvas, text="Paused", fg_color="black", font=("Arial", 30))
+        pause_label.place(relx=0.5, rely=0.2, anchor=tk.CENTER)
+
+        button_frame = tk.Frame(pause_canvas, bg="#000000")
+
+        play_button = ctk.CTkButton(master=button_frame,
+                                    width=250,
+                                    height=40,
+                                    fg_color="#5dd55d",
+                                    text_color="black",
+                                    border_width=3,
+                                    border_color="#90ee90",
+                                    corner_radius=8,
+                                    text="Resume",
+                                    hover_color= "#4ee44e",
+                                    command=lambda: toggle_pause())
+
+        home_button = ctk.CTkButton(master=button_frame,
+                                    width=250,
+                                    height=40,
+                                    fg_color="#999999",
+                                    text_color="black",
+                                    border_width=3,
+                                    border_color="#bfbfbf",
+                                    corner_radius=8,
+                                    text="Home",
+                                    hover_color= "#7a7a7a",
+                                    command=lambda: home())
+
+        quit_button = ctk.CTkButton(master=button_frame,
+                                    width=250,
+                                    height=40,
+                                    fg_color="#999999",
+                                    text_color="black",
+                                    border_width=3,
+                                    border_color="#bfbfbf",
+                                    corner_radius=8,
+                                    text="Quit",
+                                    hover_color= "#7a7a7a",
+                                    command=lambda: quit())
+
+        # Placer les boutons dans le cadre
+        play_button.pack(fill=tk.X, padx=10, pady=10)
+        home_button.pack(fill=tk.X, padx=10, pady=10)
+        quit_button.pack(fill=tk.X, padx=10, pady=10)
+
+        # Centrer le cadre sur le pause_canvas
+        button_frame.place(relx=0.5, rely=0.6, anchor=tk.CENTER)
+
+        # Centrer le pause_canvas sur la fenêtre principale
+        pause_canvas.place(x=(app.winfo_width() - 300) // 2,
+                           y=(app.winfo_height() - 300) // 2)
+
+        return pause_canvas
+
     paused = not paused
     if paused:
-        # Créer un canvas pour afficher l'écran de pause
-        pause_canvas = tk.Canvas(app, width=300, height=500, bg="black")
-        pause_canvas.create_text(
-            150, 50, text="Paused", fill="white", font=("Arial", 30))
-        pause_canvas.create_text(150, 90, text="Score: {}".format(
-            score - 10 if score != 0 else score), fill="white", font=("Arial", 16), tags="score_text")
-        
-        pause_canvas
-        # Ajouter des boutons pour les options de pause
-        home_button = tk.Button(pause_canvas, text="Home", command= lambda : home())
-        quit_button = tk.Button(pause_canvas, text="Quit", command= lambda : quit())
-        play_button = tk.Button(pause_canvas, text="Play", command= lambda : pause_game())
-
-        # Placer les boutons sur le canvas en utilisant place
-        play_button.grid(row=0, column=0)
-        home_button.grid(row=1, column=0)
-        quit_button.grid(row=2, column=0)
-
-        # Centrer le canvas sur la fenêtre principale
-        pause_canvas.place(x=(app.winfo_width() - 300) // 2,
-                           y=(app.winfo_height() - 500) // 2)
-        
-        pause_canvas.config(width=300, height=500)
-
+        pause_canvas = create_pause_menu()
     else:
         # Supprimer le canvas de pause lorsque le jeu reprend
         pause_canvas.destroy()
