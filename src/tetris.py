@@ -576,15 +576,15 @@ def game_over_screen():
     quit_img = utils.get_image("quit_icon.png", 50, 50)
 
     # Créer les boutons d'accueil, de redémarrage et de quitter
-    home_button = ctk.CTkButton(game_over_canvas, image=home_img, command= lambda : home,
+    home_button = ctk.CTkButton(game_over_canvas, image=home_img, command= lambda :home,
                                 text="", width=50, height=50, fg_color="#999999", hover_color="#7a7a7a", border_width=3,
                                 border_color="#bfbfbf",
                                 corner_radius=8,)
     restart_button = ctk.CTkButton(
-        game_over_canvas, image=restart_img, command= lambda :restart_game, text="", width=50, height=50, fg_color="#5dd55d", hover_color="#4ee44e", border_width=3,
+        game_over_canvas, image=restart_img, command=restart_game, text="", width=50, height=50, fg_color="#5dd55d", hover_color="#4ee44e", border_width=3,
         border_color="#90ee90",
         corner_radius=8,)
-    quit_button = ctk.CTkButton(game_over_canvas, image=quit_img, command= lambda :quit,
+    quit_button = ctk.CTkButton(game_over_canvas, image=quit_img, command=quit,
                                 text="", width=50, height=50, fg_color="#999999", hover_color="#7a7a7a", border_width=3,
                                 border_color="#bfbfbf",
                                 corner_radius=8,)
