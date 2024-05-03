@@ -2,6 +2,7 @@ import tkinter as tk
 import random as rd
 import threading as th
 import customtkinter as ctk
+import pyautogui
 import sys
 import utils
 
@@ -121,6 +122,8 @@ tetrominos_rotations = [
 ]
 
 
+user_screen_width, user_screen_height = pyautogui.size()
+
 playfield = [[0] * width for _ in range(height)]
 actual_piece = None
 score = 0
@@ -131,6 +134,12 @@ acceleration_coef = 1
 app = tk.Tk()
 app.title("Tetris")
 app.attributes("-fullscreen", True)
+app.update()
+retro_background = utils.get_image(
+    "bg_tetris.png", user_screen_width, user_screen_height)
+bg_img = ctk.CTkLabel(app, width=user_screen_width,
+                      height=user_screen_height, image=retro_background, text='')
+bg_img.place(x=0, y=0)
 speed = round(800 / (1 + level * acceleration_coef))
 
 waiting_piece = None
@@ -205,7 +214,7 @@ def collision_preview(piece):
             if case != 0:
                 piece_x = piece["x"] + x
                 piece_y = piece["y"] + y
-                # Vérifier si la case est en dehors des limites de la grille ou en contact avec une pièce existante
+
                 if not (0 <= piece_x < width and 0 <= piece_y < height) or playfield[piece_y][piece_x] != 0:
                     return True
     return False
@@ -582,7 +591,6 @@ def toggle_pause(event=None):
         if paused:
             pause_canvas = create_pause_menu()
         else:
-            # Supprimer le canvas de pause lorsque le jeu reprend
             pause_canvas.destroy()
             move_down()
 
@@ -670,10 +678,6 @@ def main():
     app.bind("c", change_piece)
     app.bind("<Escape>", toggle_pause)
 
-    # Créer un bouton pour la pause
-    pause_button = tk.Button(app, text="Pause", command=pause_game)
-    pause_button.pack()
-
     playfield_canvas = tk.Canvas(
         app, width=width * cell_size, height=height * cell_size, bg="black")
     playfield_canvas.pack(expand=1)
@@ -706,10 +710,12 @@ def main():
     lines_label = ctk.CTkLabel(score_canvas, text='Lines\n {}'.format(
         lines_cleared), font=("Arial", 20))
     lines_label.place(relx=0.5, rely=0.7, anchor=tk.CENTER)
-    
-    next_piece_Canvas = ctk.CTkFrame(app, width=200, height=350, corner_radius=8, fg_color="black")
-    next_piece_Canvas.place(in_ = playfield_canvas, relx=1.0, x=20, y=10, anchor=tk.NW)    
-    
+
+    next_piece_Canvas = ctk.CTkFrame(
+        app, width=200, height=350, corner_radius=8, fg_color="black")
+    next_piece_Canvas.place(in_=playfield_canvas,
+                            relx=1.0, x=20, y=10, anchor=tk.NW)
+
     threading_game_loop()
     app.mainloop()
 
