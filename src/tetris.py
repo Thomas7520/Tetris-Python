@@ -404,13 +404,48 @@ def update_score():
     if game_over:
         game_over_screen()
     else:
-        playfield_canvas.delete("score")
-        playfield_canvas.create_text(width * cell_size // 2, cell_size // 2,
-                                     text="Score: {}".format(score), fill="white", font=("Arial", 20), tag="score")
-        playfield_canvas.create_text(width * cell_size // 2, cell_size // 2 + 30, text="Lines: {}".format(
-            lines_cleared), fill="white", font=("Arial", 20), tag="score")
-        playfield_canvas.create_text(width * cell_size // 2, cell_size // 2 + 60,
-                                     text="Level: {}".format(level), fill="white", font=("Arial", 20), tag="score")
+        if 'score_label' in globals() and level_label in globals() and lines_label in globals():
+            score_label.configure(text='Score \n {}'.format(score))
+            level_label.configure(text='Level \n {}'.format(level))
+            lines_label.configure(
+                text='Lines Cleared \n {}'.format(lines_cleared))
+        else:
+            score_screen()
+
+
+def score_screen():
+    global score_canvas, score_label, level_label, lines_label
+
+    # Créer le canvas score_canvas s'il n'existe pas encore
+    if not 'score_canvas' in globals():
+        score_canvas = ctk.CTkFrame(
+            app, width=200, height=300, corner_radius=8, fg_color="black")
+        score_canvas.place(x=((app.winfo_width() - width * cell_size - SIDE_CANVAS_WIDTH) // 2 - SIDE_CANVAS_WIDTH) - 35,
+                           y=(app.winfo_height() - SIDE_CANVAS_HEIGHT*4))
+
+    # Créer ou mettre à jour le texte du score
+    if not 'score_label' in globals():
+        score_label = ctk.CTkLabel(
+            score_canvas, text='Score\n {}'.format(score), font=("Arial", 20))
+        score_label.place(relx=0.5, rely=0.3, anchor=tk.CENTER)
+    else:
+        score_label.configure(text='Score \n {}'.format(score))
+
+    # Créer ou mettre à jour le texte du niveau
+    if not 'level_label' in globals():
+        level_label = ctk.CTkLabel(
+            score_canvas, text='Level\n {}'.format(level), font=("Arial", 20))
+        level_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+    else:
+        level_label.configure(text='Level \n {}'.format(level))
+
+    # Créer ou mettre à jour le texte des lignes effacées
+    if not 'lines_label' in globals():
+        lines_label = ctk.CTkLabel(score_canvas, text='Lines\n {}'.format(
+            lines_cleared), font=("Arial", 20))
+        lines_label.place(relx=0.5, rely=0.7, anchor=tk.CENTER)
+    else:
+        lines_label.configure(text='Lines \n {}'.format(lines_cleared))
 
 
 def check_level():
@@ -433,6 +468,8 @@ def check_level():
         level = 9
     elif lines_cleared == 90:
         level = 10
+    elif lines_cleared == 120:
+        level = 11
 
 
 def refresh_side_piece():
@@ -576,7 +613,7 @@ def game_over_screen():
     quit_img = utils.get_image("quit_icon.png", 50, 50)
 
     # Créer les boutons d'accueil, de redémarrage et de quitter
-    home_button = ctk.CTkButton(game_over_canvas, image=home_img, command= lambda :home,
+    home_button = ctk.CTkButton(game_over_canvas, image=home_img, command=lambda: home,
                                 text="", width=50, height=50, fg_color="#999999", hover_color="#7a7a7a", border_width=3,
                                 border_color="#bfbfbf",
                                 corner_radius=8,)
@@ -653,6 +690,23 @@ def main():
 
     rectangle_side_canvas.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
+    score_canvas = ctk.CTkFrame(
+        app, width=200, height=300, corner_radius=8, fg_color="black")
+    score_canvas.place(x=((app.winfo_width() - width * cell_size - SIDE_CANVAS_WIDTH) // 2 - SIDE_CANVAS_WIDTH) - 35,
+                       y=(app.winfo_height() - SIDE_CANVAS_HEIGHT*4))
+
+    # Créer ou mettre à jour le texte du score
+    score_label = ctk.CTkLabel(score_canvas, text='Score\n {}'.format(score), font=("Arial", 20))
+    score_label.place(relx=0.5, rely=0.3, anchor=tk.CENTER)
+
+    # Créer ou mettre à jour le texte du niveau
+    level_label = ctk.CTkLabel(score_canvas, text='Level\n {}'.format(level), font=("Arial", 20))
+    level_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+
+    # Créer ou mettre à jour le texte des lignes effacées
+    lines_label = ctk.CTkLabel(score_canvas, text='Lines\n {}'.format(lines_cleared), font=("Arial", 20))
+    lines_label.place(relx=0.5, rely=0.7, anchor=tk.CENTER)
+    
     threading_game_loop()
     app.mainloop()
 
