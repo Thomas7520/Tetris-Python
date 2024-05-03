@@ -695,17 +695,20 @@ def main():
     score_canvas.place(x=((app.winfo_width() - width * cell_size - SIDE_CANVAS_WIDTH) // 2 - SIDE_CANVAS_WIDTH) - 35,
                        y=(app.winfo_height() - SIDE_CANVAS_HEIGHT*4))
 
-    # Créer ou mettre à jour le texte du score
-    score_label = ctk.CTkLabel(score_canvas, text='Score\n {}'.format(score), font=("Arial", 20))
+    score_label = ctk.CTkLabel(
+        score_canvas, text='Score\n {}'.format(score), font=("Arial", 20))
     score_label.place(relx=0.5, rely=0.3, anchor=tk.CENTER)
 
-    # Créer ou mettre à jour le texte du niveau
-    level_label = ctk.CTkLabel(score_canvas, text='Level\n {}'.format(level), font=("Arial", 20))
+    level_label = ctk.CTkLabel(
+        score_canvas, text='Level\n {}'.format(level), font=("Arial", 20))
     level_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
-    # Créer ou mettre à jour le texte des lignes effacées
-    lines_label = ctk.CTkLabel(score_canvas, text='Lines\n {}'.format(lines_cleared), font=("Arial", 20))
+    lines_label = ctk.CTkLabel(score_canvas, text='Lines\n {}'.format(
+        lines_cleared), font=("Arial", 20))
     lines_label.place(relx=0.5, rely=0.7, anchor=tk.CENTER)
+    
+    next_piece_Canvas = ctk.CTkFrame(app, width=200, height=350, corner_radius=8, fg_color="black")
+    next_piece_Canvas.place(in_ = playfield_canvas, relx=1.0, x=20, y=10, anchor=tk.NW)    
     
     threading_game_loop()
     app.mainloop()
