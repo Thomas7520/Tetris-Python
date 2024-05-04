@@ -134,7 +134,7 @@ acceleration_coef = 1
 app = tk.Tk()
 app.title("Tetris")
 app.attributes("-fullscreen", True)
-app.update()
+
 retro_background = utils.get_image(
     "bg_tetris.png", user_screen_width, user_screen_height)
 bg_img = ctk.CTkLabel(app, width=user_screen_width,
