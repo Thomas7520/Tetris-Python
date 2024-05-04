@@ -577,8 +577,7 @@ def toggle_pause(event=None):
             button_frame.place(relx=0.5, rely=0.6, anchor=tk.CENTER)
 
             # Centrer le pause_canvas sur la fenêtre principale
-            pause_canvas.place(x=(app.winfo_width() - 300) // 2,
-                               y=(app.winfo_height() - 300) // 2)
+            pause_canvas.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
             return pause_canvas
 
