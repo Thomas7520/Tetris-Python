@@ -98,6 +98,7 @@ def run(application : tkinter.Tk, username : str):
     frame_color = "#3566c9"
     button_color = "#778899"
     button_color_hover = "#BDB76B"
+    scrollable_color_bg = "#2B2B2B"
     
     frame_main_menu = customtkinter.CTkFrame(master=image_canvas, fg_color=frame_color, bg_color=frame_color)
     frame_main_menu.grid_columnconfigure(0, weight=1)
@@ -123,7 +124,6 @@ def run(application : tkinter.Tk, username : str):
     button_quit.grid(row=3, column=0, sticky="EW", pady=(5,10), padx=padx_button)
     
     # leaderboard menu
-    
     frame_leaderboard = customtkinter.CTkFrame(master=image_canvas,  corner_radius=0, fg_color=frame_color, bg_color=frame_color)
     frame_leaderboard.grid_rowconfigure(0, weight=1)
     frame_leaderboard.grid_rowconfigure(1, weight=1)
@@ -132,7 +132,7 @@ def run(application : tkinter.Tk, username : str):
     label_leaderboard = customtkinter.CTkLabel(master=frame_leaderboard, width=300, corner_radius=0, fg_color=frame_color, bg_color=frame_color, text="Leaderboard", font=(0,30), text_color="White")
     label_leaderboard.grid(row=0, column=0, sticky= "S", pady=10)
 
-    scrollable_frame = customtkinter.CTkScrollableFrame(width=250, master=frame_leaderboard)
+    scrollable_frame = customtkinter.CTkScrollableFrame(width=250, master=frame_leaderboard, fg_color=scrollable_color_bg, border_color=frame_color)
     scrollable_frame.grid_columnconfigure(1,weight=1)
     scrollable_frame.grid(row=1, column=0, pady=10)
     
@@ -160,7 +160,7 @@ def run(application : tkinter.Tk, username : str):
     label_options = customtkinter.CTkLabel(master=frame_options, width=300, corner_radius=0, fg_color=frame_color, bg_color=frame_color, text="Options", font=(0,30), text_color="White")
     label_options.grid(row=0, column=0, sticky= "S", pady=10)
 
-    scrollable_options = customtkinter.CTkScrollableFrame(width=250, master=frame_options)
+    scrollable_options = customtkinter.CTkScrollableFrame(width=250, master=frame_options, fg_color=scrollable_color_bg, border_color=frame_color)
     scrollable_options.grid(row=1, column=0, pady=10)
       
     label_slider = customtkinter.CTkLabel(master=scrollable_options, corner_radius=0, text="Volume", font=(0,14), text_color="White")
