@@ -135,11 +135,6 @@ app = tk.Tk()
 app.title("Tetris")
 app.attributes("-fullscreen", True)
 
-retro_background = utils.get_image(
-    "bg_tetris.png", user_screen_width, user_screen_height)
-bg_img = ctk.CTkLabel(app, width=user_screen_width,
-                      height=user_screen_height, image=retro_background, text='')
-bg_img.place(x=0, y=0)
 speed = round(800 / (1 + level * acceleration_coef))
 
 waiting_piece = None
