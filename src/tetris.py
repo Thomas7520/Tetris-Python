@@ -607,8 +607,7 @@ def game_over_screen():
     game_over_label.place(relx=0.5, rely=0.2, anchor=tk.CENTER)
 
     # Positionner le cadre de fin de partie au centre de la fenêtre
-    game_over_canvas.place(x=(app.winfo_width() - 300) // 2,
-                           y=(app.winfo_height() - 300) // 2)
+    game_over_canvas.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
     # Charger les images des boutons
     home_img = utils.get_image("home_icon.png", 50, 50)
@@ -682,7 +681,7 @@ def main():
     side_canvas = ctk.CTkFrame(
         app, width=4 * cell_size, height=4 * cell_size, corner_radius=8, fg_color="Black")
     side_canvas.place(in_=playfield_canvas,
-                            relx=1.0, x=-510, y=20, anchor=tk.NW)
+                            relx=0, x=-150, y=20, anchor=tk.NW)
 
     rectangle_side_canvas = tk.Canvas(
         side_canvas, width=4 * cell_size - 20, height=4 * cell_size - 20, bg="black", border=False)
