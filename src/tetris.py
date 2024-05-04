@@ -681,8 +681,8 @@ def main():
         app.update()
     side_canvas = ctk.CTkFrame(
         app, width=4 * cell_size, height=4 * cell_size, corner_radius=8, fg_color="Black")
-    side_canvas.place(x=(app.winfo_width() - width * cell_size - SIDE_CANVAS_WIDTH) //
-                      2 - SIDE_CANVAS_WIDTH, y=(app.winfo_height() - SIDE_CANVAS_HEIGHT*4) // 2)
+    side_canvas.place(in_=playfield_canvas,
+                            relx=1.0, x=-510, y=20, anchor=tk.NW)
 
     rectangle_side_canvas = tk.Canvas(
         side_canvas, width=4 * cell_size - 20, height=4 * cell_size - 20, bg="black", border=False)
