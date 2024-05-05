@@ -170,9 +170,10 @@ def reset_grids(app : tkinter.Tk):
     for i in range(app.grid_size()[1]):
         app.grid_rowconfigure(i, weight=0, minsize=0)
         
-def reset_places(app : tkinter.Tk):
+def remove_places(app : tkinter.Tk):
     for slave in app.place_slaves():
         slave.destroy() 
         
+def remove_packs(app : tkinter.Tk):
     for slave in app.pack_slaves():
         slave.destroy() 

@@ -512,13 +512,6 @@ def draw_side_piece(piece):
 
 def home():
     import main_menu
-# Récupérer les noms des variables actuelles dans le module
-    variables_to_keep = ["pause_canvas", "piece_rotation", "app", "name", "run", "width", "height", "cell_size", "SIDE_CELL_SIZE", "SIDE_CANVAS_WIDTH", "SIDE_CANVAS_HEIGHT", "colors", 
-                     "tetrominos_rotations", "user_screen_width", "user_screen_height", "playfield", "actual_piece", "score", 
-                     "game_over", "level", "lines_cleared", "acceleration_coef", "speed", "waiting_piece", "c_use", "paused"]
-    import types
-    
-    
 
     app.unbind(f"<{bind_options[0][1][1]}>")
     app.unbind(f"<{bind_options[1][1][1]}>")
@@ -527,14 +520,10 @@ def home():
     app.unbind(f"<{bind_options[4][1][1]}>")
     app.unbind(f"<{bind_options[5][1][1]}>")
     app.unbind("<Escape>")
-    # Supprimer toutes les variables sauf celles à conserver
-    for var_name, var_value in list(sys.modules[__name__].__dict__.items()):
-        if var_name not in variables_to_keep and not var_name.startswith("__") and not isinstance(var_value, types.ModuleType) and not isinstance(sys.modules[__name__].__dict__[var_name], types.FunctionType):
-            del sys.modules[__name__].__dict__[var_name]
     
-
+    utils.remove_places(app)
+    utils.remove_packs(app)
     
-    utils.reset_places(app)
     main_menu.run(app, name)
 
 
