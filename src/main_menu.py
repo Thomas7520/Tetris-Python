@@ -134,10 +134,8 @@ def run(application : tkinter.Tk, username : str):
     scrollable_frame.grid_columnconfigure(1,weight=1)
     scrollable_frame.grid(row=1, column=0, pady=10)
     
-    # Create a list to store the leaderboard data
-    leaderboard_data = [("Player1", 6546546), ("Player2", 846510), ("Player3", 8456654), ("Player3", 566456), ("Player3", 654564), ("Player3", 80), ("Player3", 80), ("Player3", 80), ("Player3", 80), ("Player3", 80), ("Player3", 80)]
-    
-    #leaderboard_data = utils.get_highscore_list()
+    # Create a list to store the leaderboard data    
+    leaderboard_data = utils.get_highscore_list_sorted()
     
     for i in range(len(leaderboard_data)):
         username_label = customtkinter.CTkLabel(master=scrollable_frame, corner_radius=0, text=leaderboard_data[i][0], text_color="White", font=(0, 14))

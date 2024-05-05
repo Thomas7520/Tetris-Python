@@ -101,7 +101,7 @@ def check_password(username : str, password : str) -> bool:
 def get_highscore(username: str):
     for user_options in get_users_csv(database_path / database_options):
         if username in user_options:
-            return user_options[1]
+            return int(user_options[1])
         
     raise ValueError('Could not find user with username %s' % username)
 

@@ -659,6 +659,9 @@ def game_over_screen():
     home_button.place(relx=0.25, rely=0.8, anchor=tk.CENTER)
     restart_button.place(relx=0.5, rely=0.8, anchor=tk.CENTER)
     quit_button.place(relx=0.75, rely=0.8, anchor=tk.CENTER)
+    
+    if utils.get_highscore(name) < score:
+        utils.update_highscore(name, score)
 
 
 def restart_game():
