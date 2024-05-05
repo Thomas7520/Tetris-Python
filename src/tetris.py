@@ -424,8 +424,8 @@ def score_screen():
     if not 'score_canvas' in globals():
         score_canvas = ctk.CTkFrame(
             app, width=200, height=300, corner_radius=8, fg_color="black")
-        score_canvas.place(x=((app.winfo_width() - width * cell_size - SIDE_CANVAS_WIDTH) // 2 - SIDE_CANVAS_WIDTH) - 35,
-                           y=(app.winfo_height() - SIDE_CANVAS_HEIGHT*4))
+        score_canvas.place(in_=playfield_canvas,
+                            relx=0, x=-230, y=300, anchor=tk.NW)
 
     # Créer ou mettre à jour le texte du score
     if not 'score_label' in globals():
@@ -768,7 +768,7 @@ def run(application : tk.Tk, username : str, options : list):
     side_canvas = ctk.CTkFrame(
         app, width=4 * cell_size, height=4 * cell_size, corner_radius=8, fg_color="Black")
     side_canvas.place(in_=playfield_canvas,
-                            relx=0, x=-150, y=20, anchor=tk.NW)
+                            relx=0, x=-190, y=20, anchor=tk.NW)
 
     rectangle_side_canvas = tk.Canvas(
         side_canvas, width=4 * cell_size - 20, height=4 * cell_size - 20, bg="black", border=False)
@@ -777,8 +777,8 @@ def run(application : tk.Tk, username : str, options : list):
 
     score_canvas = ctk.CTkFrame(
         app, width=200, height=300, corner_radius=8, fg_color="black")
-    score_canvas.place(x=((app.winfo_width() - width * cell_size - SIDE_CANVAS_WIDTH) // 2 - SIDE_CANVAS_WIDTH) - 35,
-                       y=(app.winfo_height() - SIDE_CANVAS_HEIGHT*4))
+    score_canvas.place(in_=playfield_canvas,
+                            relx=0, x=-230, y=300, anchor=tk.NW)
 
     score_label = ctk.CTkLabel(
         score_canvas, text='Score\n {}'.format(score), font=("Arial", 20))
