@@ -1,4 +1,4 @@
-import tkinter, customtkinter, utils
+import tkinter, customtkinter, utils, tetris
             
 def remove_frame(name : str):
     if name == "main_menu":
@@ -13,7 +13,7 @@ def remove_frame(name : str):
         frame_options.grid_forget()
     
 def play_button_pressed():
-    pass
+    tetris.run(app, name, bind_options)
 
 def show_main_menu(frame_to_remove : str):
     remove_frame(frame_to_remove)
@@ -40,12 +40,12 @@ def key_pressed_event(event):
     global button_bind_selected 
     
     key_code = event.keycode
-    key_name = str(event.keysym).capitalize()
+    key_name = str(event.keysym)
         
     if button_bind_selected is not None:
         
         if key_code == 27:
-            button_bind_selected.configure(text=button_bind_selected.cget('text')[1:-1], text_color="black")
+            button_bind_selected.configure(text=button_bind_selected.cget('text')[1:-1].capitalize(), text_color="black")
             button_bind_selected = None
             return
         
@@ -53,20 +53,20 @@ def key_pressed_event(event):
             if bind[1][0] == key_code and bind[0] != bind_options[button_bind_selected.bind_id][0]: # We don't care about assigning same value on the same bind
                 # match, can't assign this twice
                 tkinter.messagebox.showwarning(title="Conflit", message=f"Cette touche a déjà été assigné à '{bind[0]}' !")
-                button_bind_selected.configure(text=button_bind_selected.cget('text')[1:-1], text_color="black")
+                button_bind_selected.configure(text=button_bind_selected.cget('text')[1:-1].capitalize(), text_color="black")
                 button_bind_selected = None
                 return
         
         bind_options[button_bind_selected.bind_id][1] = (key_code, key_name)
         utils.update_bind_options(name, bind_options)
-        button_bind_selected.configure(text=key_name, text_color="black")
+        button_bind_selected.configure(text=key_name.capitalize(), text_color="black")
         button_bind_selected = None
         
         
 
 def run(application : tkinter.Tk, username : str):
     global app, bind_options, name
-    
+
     app = application
     bind_options = utils.get_bind_options(username)
     name = username
@@ -75,7 +75,6 @@ def run(application : tkinter.Tk, username : str):
     utils.reset_grids(app)
             
     app.attributes("-fullscreen", True)
-    app.configure(background="black")
     
     app.grid_columnconfigure(0, weight=1)
     app.grid_rowconfigure(0, weight=1)
@@ -91,7 +90,6 @@ def run(application : tkinter.Tk, username : str):
 
     image_title_label = customtkinter.CTkLabel(master=image_canvas, text="", image=title_image, bg_color="black")
     image_title_label.grid(row=0, column=0, sticky="NSWE")
-    
     
     global frame_main_menu, frame_leaderboard, frame_options
     
@@ -111,7 +109,7 @@ def run(application : tkinter.Tk, username : str):
     width_button = 250
     padx_button = 15
     
-    button_play = customtkinter.CTkButton(master=frame_main_menu, text="Jouer", corner_radius=0, height=65, fg_color=button_color, hover_color=button_color_hover, font=("Arial Bold", 20), text_color="white", width=width_button, cursor="hand2")
+    button_play = customtkinter.CTkButton(master=frame_main_menu, text="Jouer", corner_radius=0, height=65, fg_color=button_color, hover_color=button_color_hover, font=("Arial Bold", 20), text_color="white", width=width_button, cursor="hand2", command=play_button_pressed)
     button_play.grid(row=0, column=0, sticky="EW", pady=(10,5), padx=padx_button)
     
     button_leaderboard = customtkinter.CTkButton(master=frame_main_menu, text="Leaderboard", corner_radius=0, height=65, fg_color=button_color, hover_color=button_color_hover, font=("Arial Bold", 20), text_color="white", width=width_button, cursor="hand2", command=show_leaderboard)

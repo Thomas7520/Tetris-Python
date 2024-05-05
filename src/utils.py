@@ -23,7 +23,7 @@ database_users = "database_users.csv"
 # TODO: add volume value between highscore and bind_options (forgotten)
 database_options = "database_options.csv"
 
-default_bind_options = [['Rotation', (80, 'Up')], ['Chute lente', (40,'Down')],['Gauche', (37,'Left')],['Droite', (39,'Right')],['Chute rapide', (32, 'Space')], ['Garder', (67, 'C')]]
+default_bind_options = [['Rotation', (80, 'Up')], ['Chute lente', (40,'Down')],['Gauche', (37,'Left')],['Droite', (39,'Right')],['Chute rapide', (32, 'space')], ['Garder', (67, 'C')]]
 default_volume = 50
 
 def is_valid_email(email):
@@ -169,3 +169,10 @@ def reset_grids(app : tkinter.Tk):
     
     for i in range(app.grid_size()[1]):
         app.grid_rowconfigure(i, weight=0, minsize=0)
+        
+def reset_places(app : tkinter.Tk):
+    for slave in app.place_slaves():
+        slave.destroy() 
+        
+    for slave in app.pack_slaves():
+        slave.destroy() 
