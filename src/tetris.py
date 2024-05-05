@@ -691,58 +691,6 @@ def restart_game():
         game_over_canvas.destroy()
 
 
-def main():
-    """global playfield_canvas, side_canvas, rectangle_side_canvas
-    app.bind("<Left>", move_left)
-    app.bind("<Right>", move_right)
-    app.bind("<Down>", move_down_touch)
-    app.bind("<Up>", piece_rotation)
-    app.bind("<space>", drop_piece)
-    app.bind("c", change_piece)
-    app.bind("<Escape>", toggle_pause)
-
-    playfield_canvas = tk.Canvas(
-        app, width=width * cell_size, height=height * cell_size, bg="black")
-    playfield_canvas.pack(expand=1)
-
-    if sys.platform == "win32":
-        app.update()
-    side_canvas = ctk.CTkFrame(
-        app, width=4 * cell_size, height=4 * cell_size, corner_radius=8, fg_color="Black")
-    side_canvas.place(in_=playfield_canvas,
-                            relx=0, x=-150, y=20, anchor=tk.NW)
-
-    rectangle_side_canvas = tk.Canvas(
-        side_canvas, width=4 * cell_size - 20, height=4 * cell_size - 20, bg="black", border=False)
-
-    rectangle_side_canvas.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
-
-    score_canvas = ctk.CTkFrame(
-        app, width=200, height=300, corner_radius=8, fg_color="black")
-    score_canvas.place(x=((app.winfo_width() - width * cell_size - SIDE_CANVAS_WIDTH) // 2 - SIDE_CANVAS_WIDTH) - 35,
-                       y=(app.winfo_height() - SIDE_CANVAS_HEIGHT*4))
-
-    score_label = ctk.CTkLabel(
-        score_canvas, text='Score\n {}'.format(score), font=("Arial", 20))
-    score_label.place(relx=0.5, rely=0.3, anchor=tk.CENTER)
-
-    level_label = ctk.CTkLabel(
-        score_canvas, text='Level\n {}'.format(level), font=("Arial", 20))
-    level_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
-
-    lines_label = ctk.CTkLabel(score_canvas, text='Lines\n {}'.format(
-        lines_cleared), font=("Arial", 20))
-    lines_label.place(relx=0.5, rely=0.7, anchor=tk.CENTER)
-
-    next_piece_Canvas = ctk.CTkFrame(
-        app, width=200, height=350, corner_radius=8, fg_color="black")
-    next_piece_Canvas.place(in_=playfield_canvas,
-                            relx=1.0, x=20, y=10, anchor=tk.NW)
-
-    threading_game_loop()
-    app.mainloop()"""
-
-
 def run(application : tk.Tk, username : str, options : list):
     global playfield_canvas, side_canvas, rectangle_side_canvas
     
@@ -797,7 +745,6 @@ def run(application : tk.Tk, username : str, options : list):
     next_piece_Canvas.place(in_=playfield_canvas,
                             relx=1.0, x=20, y=10, anchor=tk.NW)
 
-
     global paused, game_over
     
     if paused or game_over:
@@ -806,5 +753,4 @@ def run(application : tk.Tk, username : str, options : list):
     else: 
         threading_game_loop()    
     
-if __name__ == "__main__":
-    main()
+
