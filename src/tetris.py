@@ -16,14 +16,14 @@ SIDE_CANVAS_WIDTH = 4 * cell_size
 SIDE_CANVAS_HEIGHT = 4 * cell_size
 
 colors = {
-    0: "#000000",
-    1: "#FF0000",
-    2: "#00FF00",
-    3: "#0000FF",
-    4: "#FFA500",
-    5: "#FFFF00",
-    6: "#800080",
-    7: "#00FFFF"
+    0: "#FF0000",
+    1: "#00FF00",
+    2: "#0000FF",
+    3: "#FFA500",
+    4: "#FFFF00",
+    5: "#800080",
+    6: "#00FFFF",
+    7: "#FFC0CB"
 }
 
 tetrominos_rotations = [
@@ -151,15 +151,24 @@ def new_piece():
     if not game_over:
         while len(next_pieces) != 3: 
             shape = get_random_piece()
+            color = 0
+            for y, ligne in enumerate(shape):
+                for x, cases in enumerate(ligne):
+                    for case in cases:
+                        if case != 0:
+                            color = colors[case]
+                            break
+
             next_pieces.append({
                 "forme": shape,
-                "couleur": rd.choice(list(colors.values())),
+                "couleur": color,
                 "rotation": 0,
                 "x": width // 2 - len(shape[0][0]) // 2,
                 "y": 0
             })
-    print("new list", next_pieces)
+
     actual_piece = next_pieces.pop(0)
+
     draw_next_pieces()
 
     if collision():
@@ -167,28 +176,9 @@ def new_piece():
 
 
 def draw_bordered_rectangle(x, y, fill_color):
-    grad_color_dark = darken_color(fill_color)
-    grad_color_light = lighten_color(fill_color)
     playfield_canvas.create_rectangle(x * cell_size, y * cell_size, (x + 1) * cell_size,
-                                      (y + 1) * cell_size, fill=grad_color_dark, outline="", tags="piece")
-    playfield_canvas.create_rectangle(x * cell_size, y * cell_size, (x + 1)
-                                      * cell_size, (y + 1) * cell_size, outline="black", width=2, tags="piece")
+                                      (y + 1) * cell_size, fill=fill_color, outline="black", tags="piece")
 
-
-def lighten_color(color, factor=1.2):
-    r, g, b = hex_to_rgb(color)
-    r = min(int(r * factor), 255)
-    g = min(int(g * factor), 255)
-    b = min(int(b * factor), 255)
-    return "#{:02x}{:02x}{:02x}".format(r, g, b)
-
-
-def darken_color(color, factor=0.8):
-    r, g, b = hex_to_rgb(color)
-    r = max(int(r * factor), 0)
-    g = max(int(g * factor), 0)
-    b = max(int(b * factor), 0)
-    return "#{:02x}{:02x}{:02x}".format(r, g, b)
 
 
 def hex_to_rgb(hex_color):
@@ -199,6 +189,7 @@ def hex_to_rgb(hex_color):
 def preview_piece():
     if actual_piece is not None:
         temp_piece = actual_piece.copy()
+
         rotation = actual_piece["rotation"]
         temp_piece["rotation"] = rotation
         for y_offset in range(height - len(temp_piece["forme"][rotation]), -1, -1):
@@ -244,6 +235,7 @@ def refresh_playfield():
     for y in range(height):
         for x in range(width):
             color_id = playfield[y][x]
+
             if color_id != 0:
                 draw_bordered_rectangle(x, y, colors[color_id])
 
@@ -262,6 +254,7 @@ def refresh_playfield():
                 if case != 0:
                     piece_x = actual_piece["x"] + x
                     piece_y = actual_piece["y"] + y
+
                     draw_bordered_rectangle(piece_x, piece_y, colors[case])
 
 
@@ -306,8 +299,6 @@ def draw_next_pieces():
         piece_form = piece["forme"]
         piece_color = piece["couleur"]
 
-        if piece_color == 0:
-            piece_color = "red"
 
         y_position = start_y + idx * vertical_spacing
 
@@ -737,10 +728,9 @@ def restart_game():
         game_over_canvas.destroy()
 
 def song():
-    while not game_over or not pause_game:
-        import playsound as ps
+    import playsound as ps
         
-        ps.playsound(utils.get_song('TetrisSong.wav'))
+    #ps.playsound(utils.get_song('TetrisSong.wav'))
 
 
 # Fonction pour arrêter la musique
@@ -822,5 +812,4 @@ def run(application: tk.Tk, username: str, options: list):
         restart_game()
     else:
         threading_game_loop()
-        if not game_over or not pause_game:
-            threading_song()
+        threading_song()
