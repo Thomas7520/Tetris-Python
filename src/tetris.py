@@ -130,9 +130,8 @@ score = 0
 game_over = False
 level = 1
 lines_cleared = 0
-acceleration_coef = 1
+acceleration_coef = 1.5
 
-speed = round(800 / (1 + level * acceleration_coef))
 
 waiting_piece = None
 c_use = False
@@ -338,12 +337,12 @@ def move_down():
             actual_piece["y"] += 1
             refresh_playfield()
             preview_piece()
-            app.after(speed, move_down)
+            app.after(round(1200 / (5 + level * acceleration_coef)), move_down)
         else:
             piece_fix()
             new_piece()
             refresh_playfield()
-            app.after(speed, move_down)
+            app.after(round(1200 / (5 + level * acceleration_coef)), move_down)
             update_score()
             check_level()
             c_use = False
@@ -444,7 +443,7 @@ def change_piece(event=None):
 def game_loop():
     new_piece()
     refresh_playfield()
-    app.after(speed, move_down)
+    app.after(round(1200 / (5 + level * acceleration_coef)), move_down)
 
 
 def threading_game_loop():
@@ -524,6 +523,7 @@ def check_level():
         level = 10
     elif lines_cleared == 120:
         level = 11
+    
 
 
 def refresh_side_piece():
