@@ -147,16 +147,15 @@ def get_random_piece():
 def new_piece():
     global next_pieces, game_over, actual_piece
     if not game_over:
-        if len(next_pieces) < 3:
-            for _ in range(3 - len(next_pieces)):
-                shape = get_random_piece()
-                next_pieces.append({
-                    "forme": shape,
-                    "couleur": rd.choice(list(colors.values())),
-                    "rotation": 0,
-                    "x": width // 2 - len(shape[0][0]) // 2,
-                    "y": 0
-                })
+        while len(next_pieces) is not 3: 
+            shape = get_random_piece()
+            next_pieces.append({
+                "forme": shape,
+                "couleur": rd.choice(list(colors.values())),
+                "rotation": 0,
+                "x": width // 2 - len(shape[0][0]) // 2,
+                "y": 0
+            })
     print("new list", next_pieces)
     actual_piece = next_pieces.pop(0)
     draw_next_pieces()
@@ -293,7 +292,7 @@ def draw_next_pieces():
 
     rectangle_next_piece_canvas.delete("next_pieces")
 
-    vertical_spacing = 100
+    vertical_spacing = 160
     start_y = 50
 
     max_piece_width = max(
@@ -328,6 +327,8 @@ def draw_next_pieces():
                         (y + 1) * piece_size,
                         fill=piece_color, outline="#000000", width=1, tags="next_pieces"
                     )
+
+
 
 
 def move_down():
