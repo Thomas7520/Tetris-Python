@@ -14,6 +14,7 @@ from pathlib import Path
 global root_path, image_path, database_path, database_name
 root_path = Path(__file__).resolve().parent.parent
 image_path = root_path / "images"
+song_path = root_path / "song"
 
 database_path = root_path / "database"
 
@@ -177,3 +178,6 @@ def remove_places(app : tkinter.Tk):
 def remove_packs(app : tkinter.Tk):
     for slave in app.pack_slaves():
         slave.destroy() 
+        
+def get_song(name):
+    return song_path / name

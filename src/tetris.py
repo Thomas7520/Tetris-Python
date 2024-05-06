@@ -5,6 +5,7 @@ import customtkinter as ctk
 import pyautogui
 import sys
 import utils
+import time 
 
 width = 10
 height = 22
@@ -138,6 +139,8 @@ c_use = False
 
 paused = False
 
+music_thread = None
+
 
 def get_random_piece():
     return rd.choice(tetrominos_rotations)
@@ -146,7 +149,7 @@ def get_random_piece():
 def new_piece():
     global next_pieces, game_over, actual_piece
     if not game_over:
-        while len(next_pieces) is not 3: 
+        while len(next_pieces) != 3: 
             shape = get_random_piece()
             next_pieces.append({
                 "forme": shape,
@@ -337,12 +340,13 @@ def move_down():
             actual_piece["y"] += 1
             refresh_playfield()
             preview_piece()
-            app.after(round(1200 / (5 + level * acceleration_coef)), move_down)
+            app.after(round(1500 / (5 + level * acceleration_coef)), move_down)
         else:
+            time.sleep(1)
             piece_fix()
             new_piece()
             refresh_playfield()
-            app.after(round(1200 / (5 + level * acceleration_coef)), move_down)
+            app.after(round(1500 / (5 + level * acceleration_coef)), move_down)
             update_score()
             check_level()
             c_use = False
@@ -410,7 +414,9 @@ def clear_lines():
         playfield.pop(y)
         playfield.insert(0, [0] * width)
 
+    check_level()
     refresh_playfield()
+    
 
 
 def piece_fix():
@@ -443,7 +449,7 @@ def change_piece(event=None):
 def game_loop():
     new_piece()
     refresh_playfield()
-    app.after(round(1200 / (5 + level * acceleration_coef)), move_down)
+    app.after(round(1500 / (5 + level * acceleration_coef)), move_down)
 
 
 def threading_game_loop():
@@ -653,8 +659,10 @@ def toggle_pause(event=None):
 
         paused = not paused
         if paused:
+            stop_song()
             pause_canvas = create_pause_menu()
         else:
+            threading_song()
             pause_canvas.destroy()
             move_down()
 
@@ -736,7 +744,25 @@ def restart_game():
     if 'game_over_canvas' in globals():
         game_over_canvas.destroy()
 
+def song():
+    while not game_over or not pause_game:
+        import playsound as ps
+        
+        ps.playsound(utils.get_song('TetrisSong.wav'))
 
+
+# Fonction pour arrêter la musique
+def stop_song():
+    global music_thread
+    if music_thread:
+        music_thread.join()
+
+def threading_song():
+    global song_thread
+    song_thread = th.Thread(target=song)
+    song_thread.daemon = True
+    song_thread.start()
+     
 def run(application: tk.Tk, username: str, options: list):
     global playfield_canvas, side_canvas, rectangle_side_canvas, rectangle_next_piece_canvas, next_pieces
 
@@ -745,7 +771,7 @@ def run(application: tk.Tk, username: str, options: list):
     name = username
     bind_options = options
     utils.reset_grids(app)
-
+    
     next_pieces = []
 
     app.title("Tetris")
@@ -804,3 +830,5 @@ def run(application: tk.Tk, username: str, options: list):
         restart_game()
     else:
         threading_game_loop()
+        if not game_over or not pause_game:
+            threading_song()
