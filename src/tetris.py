@@ -131,9 +131,6 @@ game_over = False
 level = 1
 lines_cleared = 0
 acceleration_coef = 1
-"""app = tk.Tk()
-app.title("Tetris")
-app.attributes("-fullscreen", True)"""
 
 speed = round(800 / (1 + level * acceleration_coef))
 
@@ -143,18 +140,27 @@ c_use = False
 paused = False
 
 
+def get_random_piece():
+    return rd.choice(tetrominos_rotations)
+
+
 def new_piece():
-    global actual_piece, game_over
+    global next_pieces, game_over, actual_piece
     if not game_over:
-        shape = rd.choice(tetrominos_rotations)
-        color = rd.choice(list(colors.values()))
-        actual_piece = {
-            "forme": shape,
-            "couleur": color,
-            "rotation": 0,
-            "x": width // 2 - len(shape[0][0]) // 2,
-            "y": 0
-        }
+        if len(next_pieces) < 3:
+            for _ in range(3 - len(next_pieces)):
+                shape = get_random_piece()
+                next_pieces.append({
+                    "forme": shape,
+                    "couleur": rd.choice(list(colors.values())),
+                    "rotation": 0,
+                    "x": width // 2 - len(shape[0][0]) // 2,
+                    "y": 0
+                })
+    print("new list", next_pieces)
+    actual_piece = next_pieces.pop(0)
+    draw_next_pieces()
+
     if collision():
         game_over = True
 
@@ -282,6 +288,48 @@ def move_down_touch(event):
             preview_piece()
 
 
+def draw_next_pieces():
+    global rectangle_next_piece_canvas, next_pieces
+
+    rectangle_next_piece_canvas.delete("next_pieces")
+
+    vertical_spacing = 100
+    start_y = 50
+
+    max_piece_width = max(
+        len(piece["forme"][piece["rotation"]][0]) for piece in next_pieces)
+
+    piece_size = min(20, 200 // (max_piece_width + 2))
+
+    for idx, piece in enumerate(next_pieces[:3]):
+        piece_form = piece["forme"]
+        piece_color = piece["couleur"]
+
+        if piece_color == 0:
+            piece_color = "red"
+
+        y_position = start_y + idx * vertical_spacing
+
+
+        piece_width = len(piece_form[piece["rotation"]][0]) * piece_size
+        piece_height = len(piece_form[piece["rotation"]]) * piece_size
+
+
+        start_x = (200 - piece_width) // 2
+
+
+        for y, ligne in enumerate(piece_form[piece["rotation"]]):
+            for x, case in enumerate(ligne):
+                if case != 0:
+
+                    rectangle_next_piece_canvas.create_rectangle(
+                        start_x + x * piece_size, y_position + y * piece_size,
+                        start_x + (x + 1) * piece_size, y_position +
+                        (y + 1) * piece_size,
+                        fill=piece_color, outline="#000000", width=1, tags="next_pieces"
+                    )
+
+
 def move_down():
     global actual_piece, score, lines_cleared, level, c_use, paused
     if actual_piece is not None and not game_over and not paused:
@@ -329,14 +377,15 @@ def piece_rotation(event=None):
 
 def collision(dx=0, dy=0):
     global actual_piece
-    rotation = actual_piece["rotation"]
-    for y, ligne in enumerate(actual_piece["forme"][rotation]):
-        for x, case in enumerate(ligne):
-            if case != 0:
-                new_x, new_y = actual_piece["x"] + \
-                    x + dx, actual_piece["y"] + y + dy
-                if not (0 <= new_x < width and 0 <= new_y < height) or playfield[new_y][new_x] != 0:
-                    return True
+    if actual_piece is not None:
+        rotation = actual_piece["rotation"]
+        for y, ligne in enumerate(actual_piece["forme"][rotation]):
+            for x, case in enumerate(ligne):
+                if case != 0:
+                    new_x, new_y = actual_piece["x"] + \
+                        x + dx, actual_piece["y"] + y + dy
+                    if not (0 <= new_x < width and 0 <= new_y < height) or playfield[new_y][new_x] != 0:
+                        return True
     return False
 
 
@@ -425,7 +474,7 @@ def score_screen():
         score_canvas = ctk.CTkFrame(
             app, width=200, height=300, corner_radius=8, fg_color="black")
         score_canvas.place(in_=playfield_canvas,
-                            relx=0, x=-230, y=300, anchor=tk.NW)
+                           relx=0, x=-230, y=300, anchor=tk.NW)
 
     # Créer ou mettre à jour le texte du score
     if not 'score_label' in globals():
@@ -512,6 +561,11 @@ def draw_side_piece(piece):
 
 def home():
     import main_menu
+# Récupérer les noms des variables actuelles dans le module
+    variables_to_keep = ["pause_canvas", "piece_rotation", "app", "name", "run", "width", "height", "cell_size", "SIDE_CELL_SIZE", "SIDE_CANVAS_WIDTH", "SIDE_CANVAS_HEIGHT", "colors",
+                         "tetrominos_rotations", "user_screen_width", "user_screen_height", "playfield", "actual_piece", "score",
+                         "game_over", "level", "lines_cleared", "acceleration_coef", "speed", "waiting_piece", "c_use", "paused"]
+    import types
 
     app.unbind(f"<{bind_options[0][1][1]}>")
     app.unbind(f"<{bind_options[1][1][1]}>")
@@ -520,12 +574,13 @@ def home():
     app.unbind(f"<{bind_options[4][1][1]}>")
     app.unbind(f"<{bind_options[5][1][1]}>")
     app.unbind("<Escape>")
-    
-    utils.remove_places(app)
-    utils.remove_packs(app)
-    
-    main_menu.run(app, name)
+    # Supprimer toutes les variables sauf celles à conserver
+    for var_name, var_value in list(sys.modules[__name__].__dict__.items()):
+        if var_name not in variables_to_keep and not var_name.startswith("__") and not isinstance(var_value, types.ModuleType) and not isinstance(sys.modules[__name__].__dict__[var_name], types.FunctionType):
+            del sys.modules[__name__].__dict__[var_name]
 
+    utils.reset_places(app)
+    main_menu.run(app, name)
 
 
 def quit():
@@ -648,13 +703,13 @@ def game_over_screen():
     home_button.place(relx=0.25, rely=0.8, anchor=tk.CENTER)
     restart_button.place(relx=0.5, rely=0.8, anchor=tk.CENTER)
     quit_button.place(relx=0.75, rely=0.8, anchor=tk.CENTER)
-    
+
     if utils.get_highscore(name) < score:
         utils.update_highscore(name, score)
 
 
 def restart_game():
-    global game_over, score, lines_cleared, level, playfield, actual_piece, waiting_piece, c_use
+    global game_over, score, lines_cleared, level, playfield, actual_piece, waiting_piece, c_use, next_pieces
 
     game_over = False
     score = 0
@@ -662,12 +717,13 @@ def restart_game():
     level = 1
 
     playfield = [[0] * width for _ in range(height)]
+    next_pieces = []
 
     actual_piece = None
     waiting_piece = None
 
     c_use = False
-    
+
     update_score()
 
     threading_game_loop()
@@ -680,14 +736,16 @@ def restart_game():
         game_over_canvas.destroy()
 
 
-def run(application : tk.Tk, username : str, options : list):
-    global playfield_canvas, side_canvas, rectangle_side_canvas
-    
+def run(application: tk.Tk, username: str, options: list):
+    global playfield_canvas, side_canvas, rectangle_side_canvas, rectangle_next_piece_canvas, next_pieces
+
     global app, name, bind_options
     app = application
     name = username
     bind_options = options
     utils.reset_grids(app)
+
+    next_pieces = []
 
     app.title("Tetris")
     app.bind(f"<{bind_options[0][1][1]}>", piece_rotation)
@@ -705,17 +763,26 @@ def run(application : tk.Tk, username : str, options : list):
     side_canvas = ctk.CTkFrame(
         app, width=4 * cell_size, height=4 * cell_size, corner_radius=8, fg_color="Black")
     side_canvas.place(in_=playfield_canvas,
-                            relx=0, x=-190, y=20, anchor=tk.NW)
+                      relx=0, x=-190, y=20, anchor=tk.NW)
 
     rectangle_side_canvas = tk.Canvas(
         side_canvas, width=4 * cell_size - 20, height=4 * cell_size - 20, bg="black", border=False)
 
     rectangle_side_canvas.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
+    next_piece_Canvas = ctk.CTkFrame(
+        app, width=200, height=350, corner_radius=8, fg_color="black")
+    next_piece_Canvas.place(in_=playfield_canvas,
+                            relx=1.0, x=20, y=10, anchor=tk.NW)
+
+    rectangle_next_piece_canvas = tk.Canvas(
+        next_piece_Canvas, width=200 - 20, height=350 - 20, bg="black", border=False)
+    rectangle_next_piece_canvas.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+
     score_canvas = ctk.CTkFrame(
         app, width=200, height=300, corner_radius=8, fg_color="black")
     score_canvas.place(in_=playfield_canvas,
-                            relx=0, x=-230, y=300, anchor=tk.NW)
+                       relx=0, x=-230, y=300, anchor=tk.NW)
 
     score_label = ctk.CTkLabel(
         score_canvas, text='Score\n {}'.format(score), font=("Arial", 20))
@@ -729,17 +796,10 @@ def run(application : tk.Tk, username : str, options : list):
         lines_cleared), font=("Arial", 20))
     lines_label.place(relx=0.5, rely=0.7, anchor=tk.CENTER)
 
-    next_piece_Canvas = ctk.CTkFrame(
-        app, width=200, height=350, corner_radius=8, fg_color="black")
-    next_piece_Canvas.place(in_=playfield_canvas,
-                            relx=1.0, x=20, y=10, anchor=tk.NW)
-
     global paused, game_over
-    
+
     if paused or game_over:
         game_over = paused = False
         restart_game()
-    else: 
-        threading_game_loop()    
-    
-
+    else:
+        threading_game_loop()
