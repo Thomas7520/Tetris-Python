@@ -340,13 +340,12 @@ def move_down():
             actual_piece["y"] += 1
             refresh_playfield()
             preview_piece()
-            app.after(round(1500 / (5 + level * acceleration_coef)), move_down)
+            app.after(round(2000 / (5 + level * acceleration_coef)), move_down)
         else:
-            time.sleep(1)
             piece_fix()
             new_piece()
             refresh_playfield()
-            app.after(round(1500 / (5 + level * acceleration_coef)), move_down)
+            app.after(round(2000 / (5 + level * acceleration_coef)), move_down)
             update_score()
             check_level()
             c_use = False
@@ -449,7 +448,7 @@ def change_piece(event=None):
 def game_loop():
     new_piece()
     refresh_playfield()
-    app.after(round(1500 / (5 + level * acceleration_coef)), move_down)
+    app.after(round(2000 / (5 + level * acceleration_coef)), move_down)
 
 
 def threading_game_loop():
