@@ -466,7 +466,7 @@ def update_score():
             score_label.configure(text='Score \n {}'.format(score))
             level_label.configure(text='Level \n {}'.format(level))
             lines_label.configure(
-                text='Lines Cleared \n {}'.format(lines_cleared),fg = "white")
+                text='Lines Cleared \n {}'.format(lines_cleared),text_color="white")
         else:
             score_screen()
 
@@ -484,26 +484,26 @@ def score_screen():
     # Créer ou mettre à jour le texte du score
     if not 'score_label' in globals():
         score_label = ctk.CTkLabel(
-            score_canvas, text='Score\n {}'.format(score), font=("Arial", 20),fg = "white")
+            score_canvas, text='Score\n {}'.format(score), font=("Arial", 20),text_color="white")
         score_label.place(relx=0.5, rely=0.3, anchor=tk.CENTER)
     else:
-        score_label.configure(text='Score \n {}'.format(score),fg = "white")
+        score_label.configure(text='Score \n {}'.format(score),text_color="white")
 
     # Créer ou mettre à jour le texte du niveau
     if not 'level_label' in globals():
         level_label = ctk.CTkLabel(
-            score_canvas, text='Level\n {}'.format(level), font=("Arial", 20),fg = "white")
+            score_canvas, text='Level\n {}'.format(level), font=("Arial", 20),text_color="white")
         level_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
     else:
-        level_label.configure(text='Level \n {}'.format(level),fg = "white")
+        level_label.configure(text='Level \n {}'.format(level),text_color="white")
 
     # Créer ou mettre à jour le texte des lignes effacées
     if not 'lines_label' in globals():
         lines_label = ctk.CTkLabel(score_canvas, text='Lines\n {}'.format(
-            lines_cleared), font=("Arial", 20),fg = "white")
+            lines_cleared), font=("Arial", 20),text_color="white")
         lines_label.place(relx=0.5, rely=0.7, anchor=tk.CENTER)
     else:
-        lines_label.configure(text='Lines \n {}'.format(lines_cleared),fg = "white")
+        lines_label.configure(text='Lines \n {}'.format(lines_cleared),text_color="white")
 
 
 def check_level():
@@ -602,7 +602,7 @@ def toggle_pause(event=None):
                 app, width=300, height=300, corner_radius=8, border_width=4, fg_color="black")
 
             pause_label = ctk.CTkLabel(
-                pause_canvas, text="Paused", fg_color="black", font=("Arial", 30),fg = "white")
+                pause_canvas, text="Paused", fg_color="black", font=("Arial", 30),text_color="white")
             pause_label.place(relx=0.5, rely=0.2, anchor=tk.CENTER)
 
             button_frame = tk.Frame(pause_canvas, bg="#000000")
@@ -675,11 +675,11 @@ def game_over_screen():
 
     # Créer le cadre pour l'écran de fin de partie
     game_over_canvas = ctk.CTkFrame(
-        app, width=300, height=300, corner_radius=8, border_width=4, fg_color="black")
+        app, width=300, height=300, corner_radius=8, border_width=4, text="black")
 
     # Ajouter une étiquette pour afficher "Game Over"
     game_over_label = ctk.CTkLabel(
-        game_over_canvas, text="Game Over", fg_color="black", font=("Arial", 35), fg = "white")
+        game_over_canvas, text="Game Over", fg_color="black", font=("Arial", 35), text_color="white")
     game_over_label.place(relx=0.5, rely=0.2, anchor=tk.CENTER)
 
     # Positionner le cadre de fin de partie au centre de la fenêtre
@@ -704,7 +704,7 @@ def game_over_screen():
                                 border_color="#bfbfbf",
                                 corner_radius=8,)
     score_label = ctk.CTkLabel(game_over_canvas, text="Score : {} \n\n Level : {}".format(
-        score, level), font=("Arial", 20),fg = "white")
+        score, level), font=("Arial", 20),text_color= "white")
 
     score_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
@@ -811,15 +811,15 @@ def run(application: tk.Tk, username: str, options: list):
                        relx=0, x=-230, y=300, anchor=tk.NW)
 
     score_label = ctk.CTkLabel(
-        score_canvas, text='Score\n {}'.format(score), font=("Arial", 20),fg = "white")
+        score_canvas, text='Score\n {}'.format(score), font=("Arial", 20),text_color = "white")
     score_label.place(relx=0.5, rely=0.3, anchor=tk.CENTER)
 
     level_label = ctk.CTkLabel(
-        score_canvas, text='Level\n {}'.format(level), font=("Arial", 20),fg = "white")
+        score_canvas, text='Level\n {}'.format(level), font=("Arial", 20),text_color = "white")
     level_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
     lines_label = ctk.CTkLabel(score_canvas, text='Lines\n {}'.format(
-        lines_cleared), font=("Arial", 20),fg = "white")
+        lines_cleared), font=("Arial", 20),text_color = "white")
     lines_label.place(relx=0.5, rely=0.7, anchor=tk.CENTER)
     
     global paused, game_over
