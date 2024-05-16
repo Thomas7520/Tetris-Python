@@ -6,6 +6,7 @@ First, before launching the program you have to install some librarys :
     pip install CTkMessagebox
     pip install pillow
     pip install threading
-    pip install 
+    pip install bcrypt
+    pip install pyautogui
 
 To launch the program go on the main.py file and enjoy ! 
